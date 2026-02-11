@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Science Teacher Manager v12</title>
+    <title>Science Teacher Manager v12.5</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
@@ -42,7 +42,7 @@
         </button>
 
         <div class="sidebar-footer">
-            <small>ScienceManager v12.0 (Intl)</small>
+            <small>ScienceManager v12.5 (Intl)</small>
         </div>
     </aside>
 
@@ -258,6 +258,7 @@
 <div id="modalProfile" class="modal-overlay">
     <div class="modal-content profile-modal-content">
         <h3 data-translate="modal_config_title">Configuración Global</h3>
+        
         <div class="config-section">
             <h4 data-translate="sec_profile">👤 Mi Perfil</h4>
             <div style="display:flex; gap:10px;">
@@ -266,6 +267,7 @@
             </div>
             <button onclick="saveProfileSettings()" class="btn-primary full-width" data-translate="btn_update_prof">Actualizar Perfil</button>
         </div>
+
         <div class="config-section">
             <h4 data-translate="sec_data">📂 Datos y Nube</h4>
             <div class="action-grid">
@@ -274,6 +276,7 @@
                 <button onclick="loadFromCloud()" class="btn-cloud-load"><i class="fas fa-cloud-download-alt"></i> <span data-translate="btn_download">Bajar de Nube</span></button>
             </div>
         </div>
+
         <div class="config-section">
             <h4 data-translate="sec_theme">🎨 Tema</h4>
             <div class="theme-buttons">
@@ -284,6 +287,14 @@
                 <button onclick="setTheme('#ec4899')" style="background:#ec4899;"></button>
             </div>
         </div>
+
+        <div class="config-section">
+            <h4 data-translate="sec_lang">🌍 Idioma / Language</h4>
+            <button onclick="toggleLanguage()" class="btn-secondary full-width" id="btnConfigLang">
+                🇺🇸 Switch to English
+            </button>
+        </div>
+
         <button onclick="closeModal('modalProfile')" class="btn-secondary full-width" data-translate="btn_close">Cerrar</button>
     </div>
 </div>

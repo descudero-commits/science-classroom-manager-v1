@@ -2,7 +2,7 @@
 // 1. CONFIGURACIÓN & TRADUCCIONES
 // ==========================================
 const PANTRY_ID = "PON_TU_ID_AQUI"; 
-const BUCKET_NAME = "ScienceTeacherV11";
+const BUCKET_NAME = "ScienceTeacherV12";
 const CLOUD_URL = `https://getpantry.cloud/apiv1/pantry/${PANTRY_ID}/basket/${BUCKET_NAME}`;
 
 const translations = {
@@ -43,7 +43,9 @@ const translations = {
         sec_profile: "👤 Mi Perfil", ph_your_name: "Tu Nombre", btn_update_prof: "Actualizar Perfil",
         sec_data: "📂 Datos y Nube",
         btn_excel: "Descargar Excel", btn_upload: "Subir a Nube", btn_download: "Bajar de Nube",
-        sec_theme: "🎨 Tema", btn_close: "Cerrar",
+        sec_theme: "🎨 Tema", 
+        sec_lang: "🌍 Idioma", // TRADUCCION NUEVA
+        btn_close: "Cerrar",
         modal_class_title: "Nueva Clase", ph_class_name: "Nombre (ej. Física 1A)", icon_hint: "Iconos sugeridos: ⚛️ 🧪 🧬 🔭 🔬 🔌 🧲 🪐 🦠",
         lbl_color: "Color:", btn_save: "Guardar",
         modal_sched_title: "Añadir al Horario", lbl_start: "Inicio", lbl_end: "Fin", btn_save_block: "Guardar Bloque",
@@ -99,7 +101,9 @@ const translations = {
         sec_profile: "👤 My Profile", ph_your_name: "Your Name", btn_update_prof: "Update Profile",
         sec_data: "📂 Data & Cloud",
         btn_excel: "Download Excel", btn_upload: "Upload to Cloud", btn_download: "Download from Cloud",
-        sec_theme: "🎨 Theme", btn_close: "Close",
+        sec_theme: "🎨 Theme", 
+        sec_lang: "🌍 Language", // TRADUCCION NUEVA
+        btn_close: "Close",
         modal_class_title: "New Class", ph_class_name: "Name (e.g. Physics 1A)", icon_hint: "Suggested icons: ⚛️ 🧪 🧬 🔭 🔬 🔌 🧲 🪐 🦠",
         lbl_color: "Color:", btn_save: "Save",
         modal_sched_title: "Add to Schedule", lbl_start: "Start", lbl_end: "End", btn_save_block: "Save Block",
@@ -128,7 +132,7 @@ let appData = {
         themeColor: '#3b82f6',
         teacherName: 'Profesor',
         teacherAvatar: '👨‍🔬',
-        language: 'es' // Nuevo campo de idioma
+        language: 'es'
     },
     classes: [],    
     students: [],   
@@ -183,6 +187,12 @@ function updateLanguageUI() {
             }
         }
     });
+    
+    // Actualizar botón del Modal Configuración
+    const btnConfig = document.getElementById('btnConfigLang');
+    if(btnConfig) {
+        btnConfig.innerHTML = lang === 'es' ? "🇺🇸 Switch to English" : "🇪🇸 Cambiar a Español";
+    }
 
     // Actualizar fecha header
     const dateOpts = { weekday: 'long', day: 'numeric', month: 'long' };
@@ -200,7 +210,7 @@ function setTheme(color) { applyTheme(color); }
 // Persistencia
 function saveLocal() { localStorage.setItem('ScienceV12', JSON.stringify(appData)); }
 function loadLocal() {
-    const s = localStorage.getItem('ScienceV12'); // Actualizado a V12 para evitar conflictos viejos
+    const s = localStorage.getItem('ScienceV12');
     if(s) {
         const parsed = JSON.parse(s);
         appData = { ...appData, ...parsed, settings: { ...appData.settings, ...parsed.settings } };
