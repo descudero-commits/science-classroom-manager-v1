@@ -19,32 +19,33 @@ const translations = {
         classes_title: "Laboratorio de Clases",
         btn_new_class: "+ Nueva Clase",
         drag_hint: "💡 Arrastra las tarjetas para reordenarlas",
-        tab_points: "🎮 Puntos", tab_planning: "📅 Planificación", tab_grades: "📊 Notas", tab_history: "📜 Historial",
+        tab_points: "🎮 Puntos", tab_planning: "📅 Planificación", tab_grades: "📊 Notas", tab_history: "📜 Historial", tab_logbook: "📖 Bitácora",
         lbl_all: "Todos",
         reason_part: "Participación", reason_hw: "Tarea Completa", reason_beh: "Conducta", reason_lab: "Buen Laboratorio", reason_mat: "Material",
         btn_redeem: "🎁 Canjear",
         plan_week_title: "Plan para esta Semana",
+        logbook_class_title: "Bitácora de esta Clase",
         grades_hint: "✏️ Para editar notas, ve al <b>Notebook > Gradebook</b>.",
         nb_title: "Notebook del Docente",
-        nb_tab_planner: "📅 Planner", nb_tab_hist: "📜 Historial Global", nb_tab_grade: "📝 Gradebook", nb_tab_admin: "👥 Admin Alumnos", nb_tab_shop: "🛍️ Tienda", nb_tab_log: "📖 Bitácora",
+        nb_tab_planner: "📅 Planner", nb_tab_hist: "📜 Historial Global", nb_tab_grade: "📝 Gradebook", nb_tab_admin: "👥 Admin Alumnos", nb_tab_shop: "🛍️ Tienda", nb_tab_log: "📖 Bitácora Global",
         planner_new: "Nueva Actividad / Lección",
         ph_task_title: "Título (ej. Reacción Redox)",
         tag_lesson: "📖 Lección", tag_test: "📝 Test", tag_hw: "🏠 Tarea", tag_proj: "🧪 Proyecto", tag_quiz: "⚡ Quiz",
         ph_period: "Periodo (ej. Trim 1)",
         ph_desc: "Descripción (ej. Pág 45-50...)",
-        btn_save_plan: "Guardar Plan", btn_cancel: "Cancelar",
+        btn_save_plan: "Guardar Plan", btn_update_plan: "Actualizar Plan", btn_cancel: "Cancelar Edición",
         ph_search_stu: "Buscar alumno...",
         lbl_sel_class: "Selecciona Clase:",
         ph_stu_name: "Nombre Alumno", btn_add: "Añadir",
         ph_reward: "Premio", btn_create: "Crear",
         imp_low: "🟢 Baja (Info)", imp_med: "🟠 Media (Aviso)", imp_high: "🔴 Alta (Crítico)",
-        ph_incident: "Detalle del incidente...", btn_register: "Registrar",
+        ph_incident: "Detalle del incidente...", btn_register: "Registrar", btn_update_anec: "Actualizar Anécdota",
         modal_config_title: "Configuración Global",
         sec_profile: "👤 Mi Perfil", ph_your_name: "Tu Nombre", btn_update_prof: "Actualizar Perfil",
         sec_data: "📂 Datos y Nube",
         btn_excel: "Descargar Excel", btn_upload: "Subir a Nube", btn_download: "Bajar de Nube",
         sec_theme: "🎨 Tema", 
-        sec_lang: "🌍 Idioma", // TRADUCCION NUEVA
+        sec_lang: "🌍 Idioma",
         btn_close: "Cerrar",
         modal_class_title: "Nueva Clase", ph_class_name: "Nombre (ej. Física 1A)", icon_hint: "Iconos sugeridos: ⚛️ 🧪 🧬 🔭 🔬 🔌 🧲 🪐 🦠",
         lbl_color: "Color:", btn_save: "Guardar",
@@ -77,11 +78,12 @@ const translations = {
         classes_title: "Class Lab",
         btn_new_class: "+ New Class",
         drag_hint: "💡 Drag cards to reorder",
-        tab_points: "🎮 Points", tab_planning: "📅 Planning", tab_grades: "📊 Grades", tab_history: "📜 History",
+        tab_points: "🎮 Points", tab_planning: "📅 Planning", tab_grades: "📊 Grades", tab_history: "📜 History", tab_logbook: "📖 Logbook",
         lbl_all: "All",
         reason_part: "Participation", reason_hw: "Homework", reason_beh: "Behavior", reason_lab: "Good Lab", reason_mat: "Material",
         btn_redeem: "🎁 Redeem",
         plan_week_title: "Plan for this Week",
+        logbook_class_title: "Class Logbook",
         grades_hint: "✏️ To edit grades, go to <b>Notebook > Gradebook</b>.",
         nb_title: "Teacher Notebook",
         nb_tab_planner: "📅 Planner", nb_tab_hist: "📜 Global History", nb_tab_grade: "📝 Gradebook", nb_tab_admin: "👥 Students Admin", nb_tab_shop: "🛍️ Shop", nb_tab_log: "📖 Logbook",
@@ -90,19 +92,19 @@ const translations = {
         tag_lesson: "📖 Lesson", tag_test: "📝 Test", tag_hw: "🏠 Homework", tag_proj: "🧪 Project", tag_quiz: "⚡ Quiz",
         ph_period: "Period (e.g. Term 1)",
         ph_desc: "Description (e.g. Pg 45-50...)",
-        btn_save_plan: "Save Plan", btn_cancel: "Cancel",
+        btn_save_plan: "Save Plan", btn_update_plan: "Update Plan", btn_cancel: "Cancel Edit",
         ph_search_stu: "Search student...",
         lbl_sel_class: "Select Class:",
         ph_stu_name: "Student Name", btn_add: "Add",
         ph_reward: "Reward", btn_create: "Create",
         imp_low: "🟢 Low (Info)", imp_med: "🟠 Medium (Warning)", imp_high: "🔴 High (Critical)",
-        ph_incident: "Incident details...", btn_register: "Register",
+        ph_incident: "Incident details...", btn_register: "Register", btn_update_anec: "Update Anecdote",
         modal_config_title: "Global Settings",
         sec_profile: "👤 My Profile", ph_your_name: "Your Name", btn_update_prof: "Update Profile",
         sec_data: "📂 Data & Cloud",
         btn_excel: "Download Excel", btn_upload: "Upload to Cloud", btn_download: "Download from Cloud",
         sec_theme: "🎨 Theme", 
-        sec_lang: "🌍 Language", // TRADUCCION NUEVA
+        sec_lang: "🌍 Language",
         btn_close: "Close",
         modal_class_title: "New Class", ph_class_name: "Name (e.g. Physics 1A)", icon_hint: "Suggested icons: ⚛️ 🧪 🧬 🔭 🔬 🔌 🧲 🪐 🦠",
         lbl_color: "Color:", btn_save: "Save",
@@ -165,7 +167,6 @@ function toggleLanguage() {
     appData.settings.language = appData.settings.language === 'es' ? 'en' : 'es';
     saveLocal();
     updateLanguageUI();
-    // Refrescar vistas para aplicar cambios dinámicos
     nav('dashboard'); 
     renderClasses();
     initNotebook();
@@ -176,7 +177,6 @@ function updateLanguageUI() {
     document.getElementById('currentLangDisplay').innerText = lang === 'es' ? 'Español' : 'English';
     document.documentElement.lang = lang;
 
-    // Traducir elementos estáticos del DOM
     document.querySelectorAll('[data-translate]').forEach(el => {
         const key = el.getAttribute('data-translate');
         if(translations[lang][key]) {
@@ -188,13 +188,11 @@ function updateLanguageUI() {
         }
     });
     
-    // Actualizar botón del Modal Configuración
     const btnConfig = document.getElementById('btnConfigLang');
     if(btnConfig) {
         btnConfig.innerHTML = lang === 'es' ? "🇺🇸 Switch to English" : "🇪🇸 Cambiar a Español";
     }
 
-    // Actualizar fecha header
     const dateOpts = { weekday: 'long', day: 'numeric', month: 'long' };
     const locale = lang === 'es' ? 'es-ES' : 'en-US';
     document.getElementById('currentDate').innerText = new Date().toLocaleDateString(locale, dateOpts);
@@ -362,38 +360,21 @@ function renderClasses() {
     });
 }
 
-// Funciones Drag & Drop
 let dragSrcEl = null;
-
-function dragStart(e) {
-    dragSrcEl = this;
-    e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text/html', this.innerHTML);
-    this.classList.add('dragging');
-}
-function dragOver(e) {
-    if (e.preventDefault) e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-    return false;
-}
+function dragStart(e) { dragSrcEl = this; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/html', this.innerHTML); this.classList.add('dragging'); }
+function dragOver(e) { if (e.preventDefault) e.preventDefault(); e.dataTransfer.dropEffect = 'move'; return false; }
 function dragEnter(e) { this.classList.add('over'); }
 function dragLeave(e) { this.classList.remove('over'); }
-function dragEnd(e) {
-    this.classList.remove('dragging');
-    document.querySelectorAll('.class-card').forEach(item => item.classList.remove('over'));
-}
+function dragEnd(e) { this.classList.remove('dragging'); document.querySelectorAll('.class-card').forEach(item => item.classList.remove('over')); }
 function dragDrop(e) {
     if (e.stopPropagation) e.stopPropagation();
     if (dragSrcEl !== this) {
         const srcIdx = parseInt(dragSrcEl.dataset.index);
         const targetIdx = parseInt(this.dataset.index);
-        
         const temp = appData.classes[srcIdx];
         appData.classes[srcIdx] = appData.classes[targetIdx];
         appData.classes[targetIdx] = temp;
-        
-        saveLocal();
-        renderClasses();
+        saveLocal(); renderClasses();
     }
     return false;
 }
@@ -404,11 +385,16 @@ function openClassDetail(id) {
     if(!cls) return nav('classes');
     document.getElementById('detailTitle').innerText = `${cls.icon||'⚛️'} ${cls.name}`;
     document.getElementById('detailTitle').style.color = cls.color;
+    
+    // Poblar selector de alumnos para bitácora rápida
+    const sel = document.getElementById('classAnecStudent');
+    sel.innerHTML = `<option value="">${t('txt_student')}</option><option value="ALL">${t('txt_all_class')}</option>`;
+    appData.students.filter(s => s.classId == id).forEach(s => sel.innerHTML += `<option value="${s.id}">${s.name}</option>`);
+
     nav('class-detail');
-    renderStudents(); renderGradesViewOnly(); renderClassHistory(); renderClassPlanning();
+    renderStudents(); renderGradesViewOnly(); renderClassHistory(); renderClassPlanning(); renderClassLogbook();
 }
 
-// Estudiantes & Puntos
 function renderStudents() {
     const list = document.getElementById('studentsList'); list.innerHTML = '';
     const classStudents = appData.students.filter(s => s.classId == currentClassId);
@@ -477,6 +463,32 @@ function renderGradesViewOnly() {
     });
     table.innerHTML = html + '</tbody>';
 }
+// NUEVO: BITÁCORA EN CLASE
+function renderClassLogbook() {
+    const list = document.getElementById('classLogbookList'); list.innerHTML = '';
+    const logs = appData.anecdotes.filter(a => a.classId == currentClassId).slice().reverse();
+    if(logs.length === 0) { list.innerHTML = `<p style="text-align:center; color:#ccc;">${t('txt_empty')}</p>`; return; }
+    logs.forEach(a => {
+        const sName = a.studentId === 'ALL' ? t('txt_all_class') : (appData.students.find(s=>s.id==a.studentId)?.name || '?');
+        list.innerHTML += `
+            <div class="anecdote-item ${a.importance}">
+                <div style="flex:1;"><strong>${sName}</strong>: ${a.text} <br><small style="color:#666">${a.date}</small></div>
+                <button class="btn-act edit" onclick="editAnecdote(${a.id}, true)">✏️</button>
+                <button class="btn-act del" onclick="delAnec(${a.id})">🗑️</button>
+            </div>`;
+    });
+}
+function saveClassAnecdote() {
+    const sid = document.getElementById('classAnecStudent').value;
+    const imp = document.getElementById('classAnecImp').value;
+    const txt = document.getElementById('classAnecText').value;
+    if(sid && txt) {
+        appData.anecdotes.push({ id: Date.now(), classId: currentClassId, studentId: sid, importance: imp, text: txt, date: new Date().toLocaleDateString() });
+        document.getElementById('classAnecText').value = '';
+        saveLocal(); renderClassLogbook();
+    }
+}
+
 function openRedeemModal() {
     if(!document.querySelectorAll('.stu-check:checked').length) return alert(t('txt_select_stu'));
     const grid = document.getElementById('redeemGrid'); 
@@ -518,7 +530,6 @@ function openNbTab(id) {
 function renderGlobalHistory() {
     const container = document.getElementById('globalHistoryContainer');
     const search = document.getElementById('globalHistSearch').value.toLowerCase();
-    
     const logs = appData.history.sort((a,b) => b.id - a.id).filter(log => {
         const s = appData.students.find(stu => stu.id == log.studentId);
         return !search || (s && s.name.toLowerCase().includes(search));
@@ -541,7 +552,7 @@ function renderGlobalHistory() {
     container.innerHTML = html + '</tbody></table>';
 }
 
-// Planner
+// Planner (Create & Edit)
 function addTask() {
     const id = document.getElementById('editTaskId').value; 
     const title = document.getElementById('taskTitle').value;
@@ -553,16 +564,41 @@ function addTask() {
 
     if(title && cid && date) {
         if(id) { 
+            // EDICIÓN
             const tk = appData.tasks.find(x => x.id == id); 
             if(tk) { tk.title = title; tk.classId = cid; tk.date = date; tk.tag = tag; tk.period = period; tk.description = desc; } 
             cancelTaskEdit(); 
         } else { 
+            // CREACIÓN
             appData.tasks.push({ id: Date.now(), title, classId: cid, date, tag, period, description: desc }); 
             document.getElementById('taskTitle').value = ''; 
             document.getElementById('taskDesc').value = '';
         }
         saveLocal(); renderTasks();
     }
+}
+function editTask(id) {
+    const tk = appData.tasks.find(x => x.id == id);
+    if(tk) {
+        document.getElementById('taskTitle').value = tk.title;
+        document.getElementById('taskClass').value = tk.classId;
+        document.getElementById('taskDate').value = tk.date;
+        document.getElementById('taskTag').value = tk.tag;
+        document.getElementById('taskPeriod').value = tk.period || '';
+        document.getElementById('taskDesc').value = tk.description || '';
+        
+        document.getElementById('editTaskId').value = tk.id;
+        document.getElementById('btnSaveTask').innerText = t('btn_update_plan');
+        document.getElementById('btnCancelTask').style.display = 'block';
+        window.scrollTo(0,0);
+    }
+}
+function cancelTaskEdit() { 
+    document.getElementById('taskTitle').value = ''; 
+    document.getElementById('taskDesc').value = '';
+    document.getElementById('editTaskId').value = ''; 
+    document.getElementById('btnSaveTask').innerText = t('btn_save_plan');
+    document.getElementById('btnCancelTask').style.display = 'none'; 
 }
 function renderTasks() {
     const list = document.getElementById('tasksList'); list.innerHTML = '';
@@ -574,15 +610,12 @@ function renderTasks() {
                 <br><small style="color:#666">${tk.description || ''}</small>
                 <br><small>${tk.date}</small>
             </div>
-            <button class="btn-act del" onclick="delTask(${tk.id})">🗑️</button>
+            <div>
+                <button class="btn-act edit" onclick="editTask(${tk.id})">✏️</button>
+                <button class="btn-act del" onclick="delTask(${tk.id})">🗑️</button>
+            </div>
         </div>`;
     });
-}
-function cancelTaskEdit() { 
-    document.getElementById('taskTitle').value = ''; 
-    document.getElementById('taskDesc').value = '';
-    document.getElementById('editTaskId').value = ''; 
-    document.getElementById('btnCancelTask').style.display = 'none'; 
 }
 function delTask(id) { if(confirm(t('txt_confirm_del'))) { appData.tasks = appData.tasks.filter(tk => tk.id !== id); saveLocal(); renderTasks(); } }
 
@@ -616,24 +649,63 @@ function renderStudentAdminList() {
 }
 function delStudent(id) { if(confirm(t('txt_confirm_del'))) { appData.students = appData.students.filter(s => s.id !== id); saveLocal(); renderStudentAdminList(); } }
 
-// Bitácora y Premios
+// Bitácora y Premios (Create & Edit)
 function saveAnecdote() {
+    const id = document.getElementById('editAnecId').value;
     const cid = document.getElementById('anecClass').value; const sid = document.getElementById('anecStudent').value;
     const imp = document.getElementById('anecImportance').value; const txt = document.getElementById('anecText').value;
+    
     if(cid && sid && txt) {
-        appData.anecdotes.push({ id: Date.now(), classId: cid, studentId: sid, importance: imp, text: txt, date: new Date().toLocaleDateString() }); 
-        document.getElementById('anecText').value = '';
+        if(id) {
+            // EDITAR
+            const anec = appData.anecdotes.find(a => a.id == id);
+            if(anec) { anec.classId = cid; anec.studentId = sid; anec.importance = imp; anec.text = txt; }
+            cancelAnecEdit();
+        } else {
+            // CREAR
+            appData.anecdotes.push({ id: Date.now(), classId: cid, studentId: sid, importance: imp, text: txt, date: new Date().toLocaleDateString() }); 
+            document.getElementById('anecText').value = '';
+        }
         saveLocal(); renderAnecdotesNotebook();
     }
 }
+function editAnecdote(id, fromClassView=false) {
+    const anec = appData.anecdotes.find(a => a.id == id);
+    if(anec) {
+        // Redirigir al notebook para editar porque ahí está el formulario completo
+        nav('notebook'); openNbTab('nb-anecdotes');
+        
+        document.getElementById('anecClass').value = anec.classId;
+        updateAnecStudents(); // Poblar select alumnos
+        document.getElementById('anecStudent').value = anec.studentId;
+        document.getElementById('anecImportance').value = anec.importance;
+        document.getElementById('anecText').value = anec.text;
+        
+        document.getElementById('editAnecId').value = anec.id;
+        document.getElementById('btnSaveAnec').innerText = t('btn_update_anec');
+        document.getElementById('btnCancelAnec').style.display = 'block';
+    }
+}
+function cancelAnecEdit() { 
+    document.getElementById('anecText').value = ''; 
+    document.getElementById('editAnecId').value = '';
+    document.getElementById('btnSaveAnec').innerText = t('btn_register');
+    document.getElementById('btnCancelAnec').style.display = "none"; 
+}
+
 function renderAnecdotesNotebook() {
     const list = document.getElementById('notebookAnecdotesList'); list.innerHTML = '';
     appData.anecdotes.slice().reverse().forEach(a => {
         const sName = a.studentId === 'ALL' ? t('txt_all_class') : (appData.students.find(s=>s.id==a.studentId)?.name || '?');
-        list.innerHTML += `<div class="anecdote-item ${a.importance}"><div style="flex:1;"><strong>${sName}</strong>: ${a.text}</div><button class="btn-act del" onclick="delAnec(${a.id})">🗑️</button></div>`;
+        list.innerHTML += `
+            <div class="anecdote-item ${a.importance}">
+                <div style="flex:1;"><strong>${sName}</strong>: ${a.text}</div>
+                <button class="btn-act edit" onclick="editAnecdote(${a.id})">✏️</button>
+                <button class="btn-act del" onclick="delAnec(${a.id})">🗑️</button>
+            </div>`;
     });
 }
-function delAnec(id) { if(confirm(t('txt_confirm_del'))) { appData.anecdotes = appData.anecdotes.filter(a => a.id !== id); saveLocal(); renderAnecdotesNotebook(); } }
+function delAnec(id) { if(confirm(t('txt_confirm_del'))) { appData.anecdotes = appData.anecdotes.filter(a => a.id !== id); saveLocal(); renderAnecdotesNotebook(); renderClassLogbook(); } }
 function updateAnecStudents() {
     const cid = document.getElementById('anecClass').value;
     const sel = document.getElementById('anecStudent'); 
@@ -686,7 +758,7 @@ function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 function openClassTab(id) { document.querySelectorAll('.class-tab-content').forEach(c => c.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); document.getElementById(id).classList.add('active'); event.target.classList.add('active'); }
 function cancelStudentEdit() { document.getElementById('adminStudentName').value = ''; document.getElementById('btnCancelStudent').style.display = 'none'; }
 function cancelRewardEdit() { document.getElementById('rewardName').value = ''; document.getElementById('btnCancelReward').style.display = 'none'; }
-function cancelAnecEdit() { document.getElementById('anecText').value = ''; document.getElementById('btnCancelAnec').style.display = "none"; }
+
 
 // Cloud
 async function saveToCloud() {
