@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Science Teacher Manager v12.7</title>
+    <title>Teacher Manager v13.0 Fixed</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
@@ -14,307 +14,139 @@
     
     <aside class="sidebar">
         <div class="profile-widget" onclick="openProfileModal()">
-            <div class="avatar-circle" id="sidebarAvatar">👨‍🔬</div>
+            <div class="avatar-circle">👨‍🏫</div>
             <div class="profile-info">
-                <h3 id="sidebarName">Profesor</h3>
-                <small>⚙️ Configuración</small>
+                <h3 id="sidebarName">Docente</h3>
+                <small>Configuración</small>
             </div>
         </div>
         
-        <div class="separator"></div>
-
         <nav class="nav-menu">
-            <button onclick="nav('dashboard')" id="nav-dashboard" class="active">
-                <i class="fas fa-atom"></i> <span>Dashboard</span>
-            </button>
-            <button onclick="nav('classes')" id="nav-classes">
-                <i class="fas fa-flask"></i> <span>Mis Clases</span>
-            </button>
-            <button onclick="nav('notebook')" id="nav-notebook">
-                <i class="fas fa-book-open"></i> <span>Notebook Global</span>
-            </button>
+            <button onclick="nav('dashboard')" id="nav-dashboard" class="active"><i class="fas fa-home"></i> Dashboard</button>
+            <button onclick="nav('classes')" id="nav-classes"><i class="fas fa-chalkboard-teacher"></i> Mis Clases</button>
+            <button onclick="nav('notebook')" id="nav-notebook"><i class="fas fa-book"></i> Notebook Global</button>
         </nav>
-
-        <div class="separator"></div>
-        <div class="sidebar-footer">
-            <small>ScienceManager v12.7</small>
-        </div>
     </aside>
 
     <main class="main-content">
         
         <section id="view-dashboard" class="view active">
-            <header>
-                <h1>Panel de Control</h1>
-                <span class="date-badge" id="currentDate"></span>
-            </header>
-
+            <header><h1>Panel de Control</h1></header>
             <div class="widgets-row">
-                <div class="widget warning-widget">
-                    <h3><i class="fas fa-radiation-alt"></i> Alertas Recientes</h3>
+                <div class="widget">
+                    <h3>🔔 Alertas Críticas</h3>
                     <div id="dash-alerts" class="widget-list"></div>
                 </div>
                 <div class="widget">
-                    <h3><i class="fas fa-calendar-day"></i> Agenda Semanal</h3>
+                    <h3>📅 Agenda Semanal</h3>
                     <div id="dash-weekly-plan" class="widget-list"></div>
-                </div>
-            </div>
-
-            <div class="schedule-section">
-                <h3>📅 Horario Semanal</h3>
-                <div class="weekly-grid">
-                    <div class="day-col"><h4>Lunes</h4><div id="sch-mon" class="day-content"></div><button onclick="openScheduleModal('mon')">+</button></div>
-                    <div class="day-col"><h4>Martes</h4><div id="sch-tue" class="day-content"></div><button onclick="openScheduleModal('tue')">+</button></div>
-                    <div class="day-col"><h4>Miércoles</h4><div id="sch-wed" class="day-content"></div><button onclick="openScheduleModal('wed')">+</button></div>
-                    <div class="day-col"><h4>Jueves</h4><div id="sch-thu" class="day-content"></div><button onclick="openScheduleModal('thu')">+</button></div>
-                    <div class="day-col"><h4>Viernes</h4><div id="sch-fri" class="day-content"></div><button onclick="openScheduleModal('fri')">+</button></div>
                 </div>
             </div>
         </section>
 
         <section id="view-classes" class="view">
             <header>
-                <h1>Laboratorio de Clases</h1>
+                <h1>Mis Clases</h1>
                 <button onclick="openClassModal()" class="btn-primary">+ Nueva Clase</button>
             </header>
-            <div class="drag-hint"><small>💡 Arrastra las tarjetas para reordenarlas</small></div>
             <div id="classesGrid" class="grid-cards"></div>
         </section>
 
         <section id="view-class-detail" class="view">
             <header class="detail-header">
-                <button onclick="nav('classes')" class="btn-back"><i class="fas fa-arrow-left"></i></button>
+                <button onclick="nav('classes')" class="btn-back"><i class="fas fa-arrow-left"></i> Volver</button>
                 <h1 id="detailTitle">Clase</h1>
                 <div class="header-actions">
-                    <button onclick="editCurrentClass()" class="btn-secondary"><i class="fas fa-pencil-alt"></i></button>
                     <button onclick="deleteCurrentClass()" class="btn-danger"><i class="fas fa-trash"></i></button>
                 </div>
             </header>
 
             <div class="tabs">
-                <button class="tab-btn active" onclick="openClassTab('tab-mgmt')">🎮 Puntos</button>
+                <button class="tab-btn active" onclick="openClassTab('tab-mgmt')">🎮 Gestión</button>
+                <button class="tab-btn" onclick="openClassTab('tab-logbook')">📖 Bitácora (Logbook)</button>
                 <button class="tab-btn" onclick="openClassTab('tab-planning')">📅 Planificación</button>
-                <button class="tab-btn" onclick="openClassTab('tab-grades-view')">📊 Notas</button>
-                <button class="tab-btn" onclick="openClassTab('tab-history')">📜 Historial</button>
-                <button class="tab-btn" onclick="openClassTab('tab-logbook')">📖 Bitácora</button>
             </div>
 
             <div id="tab-mgmt" class="class-tab-content active">
                 <div class="toolbar-bulk">
-                    <div class="bulk-left">
-                        <div class="bulk-group">
-                            <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
-                            <label for="selectAll">Todos</label>
-                        </div>
-                        <select id="pointReason" class="reason-select">
-                            <option value="Participación">Participación</option>
-                            <option value="Tarea">Tarea Completa</option>
-                            <option value="Conducta">Conducta</option>
-                            <option value="Laboratorio">Buen Laboratorio</option>
-                            <option value="Material">Material</option>
-                        </select>
-                    </div>
-                    <div class="bulk-actions">
-                        <button onclick="applyPoints(1)" class="btn-icon-small success">+1</button>
-                        <button onclick="applyPoints(5)" class="btn-icon-small success">+5</button>
-                        <button onclick="applyPoints(-1)" class="btn-icon-small danger">-1</button>
-                        <div class="custom-points-box">
-                            <input type="number" id="customPointsInput" placeholder="#">
-                            <button onclick="applyCustomPoints()" class="btn-icon-small info">OK</button>
-                        </div>
-                        <button onclick="openRedeemModal()" class="btn-redeem">🎁 Canjear</button>
-                    </div>
+                    <select id="pointReason">
+                        <option value="Participación">Participación</option>
+                        <option value="Tarea">Tarea</option>
+                        <option value="Conducta">Conducta</option>
+                    </select>
+                    <button onclick="applyPoints(1)" class="btn-icon-small success">+1</button>
+                    <button onclick="applyPoints(-1)" class="btn-icon-small danger">-1</button>
                 </div>
                 <div id="studentsList" class="students-grid"></div>
             </div>
 
-            <div id="tab-planning" class="class-tab-content">
-                <div class="card">
-                    <h3>Plan para esta Semana</h3>
-                    <div id="classWeeklyPlanList" class="list-vertical"></div>
-                </div>
-            </div>
-
-            <div id="tab-grades-view" class="class-tab-content">
-                <div class="info-banner">✏️ Para editar notas, ve al <b>Notebook Global > Gradebook</b>.</div>
-                <div class="table-container">
-                    <table class="data-table" id="gradesTableView"></table>
-                </div>
-            </div>
-
-            <div id="tab-history" class="class-tab-content">
-                <div id="classHistoryList" class="history-table-container"></div>
-            </div>
-
             <div id="tab-logbook" class="class-tab-content">
-                <div class="card">
-                    <h3>Bitácora de esta Clase</h3>
+                <div class="card" style="border: 2px solid var(--primary);">
+                    <h3>📝 Nueva Entrada / Editar</h3>
                     <div class="form-grid">
                         <select id="classAnecStudent" class="span-2">
-                            <option value="">-- Alumno --</option>
+                            <option value="">-- Seleccionar Alumno --</option>
                         </select>
                         <select id="classAnecImp">
                             <option value="low">🟢 Info</option>
                             <option value="medium">🟠 Aviso</option>
                             <option value="high">🔴 Crítico</option>
                         </select>
-                        <input type="hidden" id="editClassAnecId"> <div style="display:flex; gap:5px;">
-                            <button onclick="saveClassAnecdote()" id="btnSaveClassAnec" class="btn-primary" style="flex:1;">💾 Guardar</button>
-                            <button onclick="cancelClassAnecEdit()" id="btnCancelClassAnec" class="btn-secondary" style="display:none;">❌</button>
-                        </div>
                     </div>
-                    <textarea id="classAnecText" placeholder="Escribir observación..." style="height:60px;"></textarea>
+                    <textarea id="classAnecText" placeholder="Escribir observación..." style="width:100%; height:60px; margin-top:5px;"></textarea>
+                    
+                    <input type="hidden" id="editClassAnecId">
+                    
+                    <div style="margin-top:10px; display:flex; gap:10px;">
+                        <button onclick="saveClassAnecdote()" id="btnSaveClassAnec" class="btn-primary full-width">💾 Guardar Entrada</button>
+                        <button onclick="cancelClassAnecEdit()" id="btnCancelClassAnec" class="btn-secondary" style="display:none;">❌ Cancelar</button>
+                    </div>
                 </div>
+
+                <h3>Historial de Bitácora</h3>
                 <div id="classLogbookList" class="list-vertical"></div>
+            </div>
+
+            <div id="tab-planning" class="class-tab-content">
+                <div id="classWeeklyPlanList" class="list-vertical"></div>
             </div>
         </section>
 
         <section id="view-notebook" class="view">
-            <header><h1>Notebook del Docente</h1></header>
-            
+            <header><h1>Notebook Global</h1></header>
             <div class="notebook-tabs">
-                <button class="nb-tab active" onclick="openNbTab('nb-planner')">📅 Planner</button>
-                <button class="nb-tab" onclick="openNbTab('nb-anecdotes')">📖 Bitácora Global</button>
-                <button class="nb-tab" onclick="openNbTab('nb-gradebook')">📝 Gradebook</button>
-                <button class="nb-tab" onclick="openNbTab('nb-students')">👥 Admin Alumnos</button>
-                <button class="nb-tab" onclick="openNbTab('nb-global-history')">📜 Historial Global</button>
-                <button class="nb-tab" onclick="openNbTab('nb-shop')">🛍️ Tienda</button>
+                <button class="nb-tab active" onclick="openNbTab('nb-anecdotes')">📖 Bitácora Global</button>
+                <button class="nb-tab" onclick="openNbTab('nb-planner')">📅 Planner</button>
             </div>
 
-            <div id="nb-planner" class="nb-content active">
-                <div class="card planner-form">
-                    <h3 id="plannerFormTitle">Nueva Actividad / Lección</h3>
-                    <div class="form-grid">
-                        <input type="text" id="taskTitle" placeholder="Título (ej. Reacción Redox)" class="span-2">
-                        <select id="taskClass"></select>
-                        <input type="date" id="taskDate">
-                        <select id="taskTag">
-                            <option value="Lección">📖 Lección</option>
-                            <option value="Test">📝 Test</option>
-                            <option value="Tarea">🏠 Tarea</option>
-                            <option value="Proyecto">🧪 Proyecto</option>
-                            <option value="Quiz">⚡ Quiz</option>
-                        </select>
-                        <input type="text" id="taskPeriod" placeholder="Periodo (ej. Trim 1)">
-                        <textarea id="taskDesc" class="span-2" placeholder="Descripción..." style="height:60px;"></textarea>
-                    </div>
-                    <input type="hidden" id="editTaskId">
-                    <div class="form-actions">
-                        <button onclick="addTask()" id="btnSaveTask" class="btn-primary full-width">Guardar Plan</button>
-                        <button onclick="cancelTaskEdit()" id="btnCancelTask" class="btn-secondary full-width" style="display:none; margin-top:5px;">Cancelar Edición</button>
-                    </div>
+            <div id="nb-anecdotes" class="nb-content active">
+                <div id="notebookAnecdotesList" class="list-vertical"></div>
+            </div>
+
+            <div id="nb-planner" class="nb-content">
+                 <div class="card">
+                    <h3>Nueva Tarea</h3>
+                    <input type="text" id="taskTitle" placeholder="Título">
+                    <select id="taskClass"></select>
+                    <input type="date" id="taskDate">
+                    <button onclick="addTask()" class="btn-primary">Guardar</button>
                 </div>
                 <div id="tasksList" class="list-vertical"></div>
-            </div>
-
-            <div id="nb-anecdotes" class="nb-content">
-                <div class="card">
-                    <div class="form-grid">
-                        <select id="anecClass" onchange="updateAnecStudents()">
-                            <option value="">Clase...</option>
-                        </select>
-                        <select id="anecStudent" disabled></select>
-                        <select id="anecImportance">
-                            <option value="low">🟢 Baja (Info)</option>
-                            <option value="medium">🟠 Media (Aviso)</option>
-                            <option value="high">🔴 Alta (Crítico)</option>
-                        </select>
-                    </div>
-                    <textarea id="anecText" placeholder="Detalle del incidente..."></textarea>
-                    <input type="hidden" id="editAnecId">
-                    <div class="form-actions">
-                        <button onclick="saveAnecdote()" id="btnSaveAnec" class="btn-primary full-width" style="margin-top:10px;">Registrar</button>
-                        <button onclick="cancelAnecEdit()" id="btnCancelAnec" class="btn-secondary full-width" style="margin-top:5px; display:none;">Cancelar Edición</button>
-                    </div>
-                </div>
-                <div id="notebookAnecdotesList" class="history-list"></div>
-            </div>
-
-            <div id="nb-gradebook" class="nb-content">
-                <div class="filter-bar">
-                    <label>Selecciona Clase:</label>
-                    <select id="gradebookClassSelect" onchange="renderCentralGradebook()">
-                        <option value="">-- Seleccionar --</option>
-                    </select>
-                </div>
-                <div class="table-container" id="centralGradebookContainer"></div>
-            </div>
-
-            <div id="nb-students" class="nb-content">
-                <div class="card form-row">
-                    <select id="adminStudentClass"><option value="">Clase...</option></select>
-                    <input type="text" id="adminStudentName" placeholder="Nombre Alumno">
-                    <button onclick="saveStudentAdmin()" class="btn-primary">Añadir</button>
-                </div>
-                <div id="adminStudentsList" class="list-vertical"></div>
-            </div>
-
-            <div id="nb-global-history" class="nb-content">
-                <input type="text" id="globalHistSearch" placeholder="Buscar alumno..." onkeyup="renderGlobalHistory()" style="width:100%; margin-bottom:10px;">
-                <div class="table-container" id="globalHistoryContainer"></div>
-            </div>
-
-            <div id="nb-shop" class="nb-content">
-                <div class="card form-row">
-                    <input type="text" id="rewardName" placeholder="Premio">
-                    <input type="number" id="rewardCost" placeholder="Pts" style="width:80px;">
-                    <button onclick="saveReward()" class="btn-primary">Crear</button>
-                </div>
-                <div id="rewardsConfigList" class="grid-cards-small"></div>
             </div>
         </section>
 
     </main>
 </div>
 
-<div id="modalProfile" class="modal-overlay">
-    <div class="modal-content">
-        <h3>Configuración</h3>
-        <input type="text" id="profName" placeholder="Tu Nombre">
-        <div style="margin-top:10px; display:flex; gap:5px;">
-            <button onclick="setTheme('#3b82f6')" style="background:#3b82f6; width:30px; height:30px; border-radius:50%; border:none;"></button>
-            <button onclick="setTheme('#8b5cf6')" style="background:#8b5cf6; width:30px; height:30px; border-radius:50%; border:none;"></button>
-            <button onclick="setTheme('#10b981')" style="background:#10b981; width:30px; height:30px; border-radius:50%; border:none;"></button>
-        </div>
-        <button onclick="saveProfileSettings()" class="btn-primary full-width" style="margin-top:15px;">Guardar</button>
-        <button onclick="closeModal('modalProfile')" class="btn-secondary full-width">Cerrar</button>
-    </div>
-</div>
-
 <div id="modalClass" class="modal-overlay">
     <div class="modal-content">
-        <h3>Clase</h3>
-        <input type="text" id="modalClassIcon" placeholder="Emoji (⚛️)" style="width:50px;">
+        <h3>Nueva Clase</h3>
         <input type="text" id="modalClassName" placeholder="Nombre Clase">
-        <div class="color-picker" id="classColorPicker">
-             </div>
-        <input type="hidden" id="selectedColor" value="#3b82f6">
-        <input type="hidden" id="editClassId">
-        <button onclick="saveClass()" class="btn-primary full-width">Guardar</button>
+        <button onclick="saveClass()" class="btn-primary full-width">Crear</button>
         <button onclick="closeModal('modalClass')" class="btn-secondary full-width">Cancelar</button>
     </div>
 </div>
 
-<div id="modalSchedule" class="modal-overlay">
-    <div class="modal-content">
-        <h3>Añadir Bloque</h3>
-        <select id="schedClassSelect"></select>
-        <input type="time" id="schedTimeStart">
-        <input type="time" id="schedTimeEnd">
-        <button onclick="saveScheduleItem()" class="btn-primary full-width">Guardar</button>
-        <button onclick="closeModal('modalSchedule')" class="btn-secondary full-width">Cancelar</button>
-    </div>
-</div>
-
-<div id="modalRedeem" class="modal-overlay">
-    <div class="modal-content">
-        <h3>Canjear Premio</h3>
-        <div id="redeemGrid" class="redeem-grid"></div>
-        <button onclick="closeModal('modalRedeem')" class="btn-secondary full-width">Cancelar</button>
-    </div>
-</div>
-
-<script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
