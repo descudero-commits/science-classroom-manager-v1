@@ -1,6 +1,11 @@
+// ================= CONFIGURACIÓN DE NUBE (HARDCODED) =================
+const PANTRY_ID = "9df76c09-c878-45e6-9df9-7b02d9cd00ef"; // <--- PEGA TU ID DENTRO DE LAS COMILLAS
+const BASKET_NAME = "teacherAppV12";
+const PANTRY_BASE = "https://getpantry.cloud/apiv1/pantry/";
+
 // ================= DATA & INIT =================
 let appData = {
-    settings: { name: 'Docente', theme: '#3b82f6', pantryId: '', lang: 'es' },
+    settings: { name: 'Docente', theme: '#3b82f6', lang: 'es' },
     classes: [], 
     students: [], 
     tasks: [], 
@@ -10,10 +15,6 @@ let appData = {
     history: []
 };
 let currentClassId = null;
-
-// PANTRY CONFIG
-const PANTRY_BASE = "https://getpantry.cloud/apiv1/pantry/";
-const BASKET_NAME = "teacherAppV12";
 
 // TRANSLATION DICTIONARY
 const translations = {
@@ -28,10 +29,10 @@ const translations = {
         nbPlanner: "📅 Planner", nbLog: "📖 Bitácora Global", nbShop: "🛍️ Tienda",
         taskNew: "Nueva Tarea", btnAdd: "Añadir", logGlobalTitle: "Registro Global", btnCreate: "Crear",
         lblName: "👤 Tu Nombre", lblLang: "🌍 Idioma / Language", lblTheme: "🎨 Color del Tema", btnReset: "Restaurar",
-        cloudHelp: "Pega tu ID para sincronizar.", btnLoadCloud: "Descargar Nube", btnSaveCloud: "Subir a Nube",
+        cloudHelp: "Sincroniza usando el ID del script.", btnLoadCloud: "Descargar", btnSaveCloud: "Subir",
         lblReport: "📊 Reportes", btnExcel: "Descargar Excel", btnSaveConfig: "Guardar Configuración", btnClose: "Cerrar",
         schedAdd: "Añadir Bloque",
-        alertNoId: "Por favor introduce tu Pantry ID primero.",
+        alertNoId: "Configura el PANTRY_ID en script.js primero.",
         syncSuccess: "¡Sincronización Exitosa!", syncError: "Error de conexión.",
         studentsStr: "Alumnos"
     },
@@ -46,10 +47,10 @@ const translations = {
         nbPlanner: "📅 Planner", nbLog: "📖 Global Log", nbShop: "🛍️ Shop",
         taskNew: "New Task", btnAdd: "Add", logGlobalTitle: "Global Record", btnCreate: "Create",
         lblName: "👤 Your Name", lblLang: "🌍 Language", lblTheme: "🎨 Theme Color", btnReset: "Reset",
-        cloudHelp: "Paste your ID to sync.", btnLoadCloud: "Download from Cloud", btnSaveCloud: "Save to Cloud",
+        cloudHelp: "Sync using the ID in script.js.", btnLoadCloud: "Download", btnSaveCloud: "Upload",
         lblReport: "📊 Reports", btnExcel: "Download Excel", btnSaveConfig: "Save Settings", btnClose: "Close",
         schedAdd: "Add Block",
-        alertNoId: "Please enter your Pantry ID first.",
+        alertNoId: "Please set PANTRY_ID in script.js first.",
         syncSuccess: "Sync Successful!", syncError: "Connection Error.",
         studentsStr: "Students"
     }
@@ -62,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadLocal();
     applySettings();
     nav('dashboard');
-    if(appData.settings.pantryId) cloudSync('pull', true); // Intentar sync silencioso al inicio
+    if(PANTRY_ID && PANTRY_ID !== "TU_ID_DE_PANTRY_AQUI") cloudSync('pull', true);
 });
 
 // ================= NAVIGATION =================
@@ -429,18 +430,16 @@ function renderRewards() {
     appData.rewards.forEach(r => d.innerHTML += `<div style="border:1px solid #ddd; padding:5px; text-align:center">${r.name}<br><b>${r.cost} pts</b></div>`);
 }
 
-// ================= CONFIG & CLOUD (PANTRY) =================
+// ================= CONFIG & CLOUD (PANTRY HARDCODED) =================
 function openProfileModal() {
     document.getElementById('profName').value = appData.settings.name;
     document.getElementById('profTheme').value = appData.settings.theme;
-    document.getElementById('pantryId').value = appData.settings.pantryId || '';
     document.getElementById('modalProfile').style.display = 'flex';
 }
 
 function saveProfile() {
     appData.settings.name = document.getElementById('profName').value;
     appData.settings.theme = document.getElementById('profTheme').value;
-    appData.settings.pantryId = document.getElementById('pantryId').value;
     
     applySettings();
     saveLocal();
@@ -450,7 +449,7 @@ function saveProfile() {
 function changeLang(l) {
     appData.settings.lang = l;
     updateLanguageUI();
-    renderClasses(); // Refresh dynamic text
+    renderClasses();
     updateDashboard();
 }
 
@@ -467,9 +466,14 @@ function applySettings() {
     document.getElementById('sidebarName').innerText = appData.settings.name;
     document.documentElement.style.setProperty('--primary', appData.settings.theme);
     updateLanguageUI();
+    
     const status = document.getElementById('syncStatus');
-    if(appData.settings.pantryId) status.innerText = "☁️ " + (appData.settings.lang==='es' ? "Nube OK" : "Cloud OK");
-    else status.innerText = "☁️ Offline";
+    // Check if ID is default or set
+    if(PANTRY_ID && PANTRY_ID !== "TU_ID_DE_PANTRY_AQUI") {
+        status.innerText = "☁️ " + (appData.settings.lang==='es' ? "Nube OK" : "Cloud OK");
+    } else {
+        status.innerText = "☁️ Offline (No ID)";
+    }
 }
 
 function resetTheme() {
@@ -478,11 +482,12 @@ function resetTheme() {
 
 // --- CLOUD SYNC LOGIC ---
 async function cloudSync(action, silent = false) {
-    const pid = appData.settings.pantryId;
-    const btnId = action === 'push' ? 'btnSaveCloud' : 'btnLoadCloud';
-    if(!pid) return !silent && alert(t('alertNoId'));
+    // Use hardcoded ID
+    if(!PANTRY_ID || PANTRY_ID === "TU_ID_DE_PANTRY_AQUI") {
+        return !silent && alert(t('alertNoId'));
+    }
     
-    const url = `${PANTRY_BASE}${pid}/basket/${BASKET_NAME}`;
+    const url = `${PANTRY_BASE}${PANTRY_ID}/basket/${BASKET_NAME}`;
     const status = document.getElementById('syncStatus');
     status.innerText = "☁️ ...";
 
@@ -496,7 +501,7 @@ async function cloudSync(action, silent = false) {
             if(!silent) alert(t('syncSuccess'));
         } else {
             const res = await fetch(url);
-            if(!res.ok) throw new Error("No data");
+            if(!res.ok) throw new Error("No data or Bad ID");
             const data = await res.json();
             appData = { ...appData, ...data };
             saveLocal();
@@ -533,9 +538,9 @@ function exportExcel() {
 }
 
 // ================= UTILS & OTHERS =================
-function saveLocal() { localStorage.setItem('TeacherAppV12_8', JSON.stringify(appData)); }
+function saveLocal() { localStorage.setItem('TeacherAppV12_0', JSON.stringify(appData)); }
 function loadLocal() {
-    const d = localStorage.getItem('TeacherAppV12_8');
+    const d = localStorage.getItem('TeacherAppV12_0');
     if(d) appData = { ...appData, ...JSON.parse(d) };
 }
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teacher Manager v12.8 Global</title>
+    <title>Teacher Manager v12.0</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
@@ -232,13 +232,12 @@
 
         <hr style="margin: 10px 0; border:0; border-top:1px solid #eee;">
 
-        <label><b>☁️ Pantry Cloud ID</b></label>
-        <input type="text" id="pantryId" placeholder="Ej: 994ad... (Tu ID de Pantry)">
-        <small style="color:#666; display:block; margin-bottom:5px;" data-translate="cloudHelp">Pega tu ID para sincronizar.</small>
+        <label><b>☁️ Pantry Cloud</b></label>
+        <small style="color:#666; display:block; margin-bottom:5px;" data-translate="cloudHelp">Sincroniza usando el ID del script.</small>
         
         <div style="display:flex; gap:5px; margin-bottom:15px;">
-            <button onclick="cloudSync('pull')" class="btn-primary full-width" style="background:var(--warning)">📥 <span data-translate="btnLoadCloud">Descargar Nube</span></button>
-            <button onclick="cloudSync('push')" class="btn-secondary full-width">📤 <span data-translate="btnSaveCloud">Subir a Nube</span></button>
+            <button onclick="cloudSync('pull')" class="btn-primary full-width" style="background:var(--warning)">📥 <span data-translate="btnLoadCloud">Descargar</span></button>
+            <button onclick="cloudSync('push')" class="btn-secondary full-width">📤 <span data-translate="btnSaveCloud">Subir</span></button>
         </div>
 
         <hr style="margin: 10px 0; border:0; border-top:1px solid #eee;">
