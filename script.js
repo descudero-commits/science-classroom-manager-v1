@@ -1,546 +1,570 @@
+// ================= DATA & INIT =================
 let appData = {
-    settings: { themeColor: '#3b82f6', teacherName: 'Profesor' },
-    classes: [], students: [], tasks: [], anecdotes: [], rewards: [], history: [], schedule: {}
+    settings: { name: 'Docente', theme: '#3b82f6', pantryId: '9df76c09-c878-45e6-9df9-7b02d9cd00ef' },
+    classes: [], 
+    students: [], 
+    tasks: [], 
+    anecdotes: [], 
+    rewards: [],
+    schedule: { mon:[], tue:[], wed:[], thu:[], fri:[] },
+    history: []
 };
 let currentClassId = null;
 
+// PANTRY CONFIG
+const PANTRY_BASE = "https://getpantry.cloud/apiv1/pantry/";
+const BASKET_NAME = "teacherAppV12";
+
 document.addEventListener('DOMContentLoaded', () => {
     loadLocal();
-    applyTheme(appData.settings.themeColor);
-    updateProfileUI();
+    applySettings();
     nav('dashboard');
+    // Intentar auto-sync si hay ID
+    if(appData.settings.pantryId) cloudSync('pull', true);
 });
 
-// ================= NAVEGACIÓN Y GENERAL =================
+// ================= NAVIGATION =================
 function nav(viewId) {
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     document.querySelectorAll('.nav-menu button').forEach(b => b.classList.remove('active'));
     document.getElementById(`view-${viewId}`).classList.add('active');
     const btn = document.getElementById(`nav-${viewId}`);
     if(btn) btn.classList.add('active');
-    
+
     if(viewId === 'classes') renderClasses();
     if(viewId === 'notebook') initNotebook();
     if(viewId === 'dashboard') updateDashboard();
 }
 
-function saveLocal() { localStorage.setItem('ScienceV13_Merged', JSON.stringify(appData)); }
-function loadLocal() {
-    const s = localStorage.getItem('ScienceV13_Merged');
-    if(s) appData = { ...appData, ...JSON.parse(s) };
-}
-
-function applyTheme(color) {
-    document.documentElement.style.setProperty('--primary', color);
-    appData.settings.themeColor = color;
-}
-function setTheme(c) { applyTheme(c); }
-
-function updateProfileUI() {
-    document.getElementById('sidebarName').innerText = appData.settings.teacherName;
-    document.getElementById('profName').value = appData.settings.teacherName;
-}
-function openProfileModal() { document.getElementById('modalProfile').style.display = 'flex'; }
-function saveProfileSettings() {
-    appData.settings.teacherName = document.getElementById('profName').value;
-    updateProfileUI(); saveLocal(); closeModal('modalProfile');
-}
-
-// ================= DASHBOARD =================
-function updateDashboard() {
-    const alerts = appData.anecdotes.filter(a => a.importance === 'high');
-    const divA = document.getElementById('dash-alerts');
-    divA.innerHTML = alerts.length ? '' : '<small>Sin alertas críticas.</small>';
-    alerts.forEach(a => {
-        const s = appData.students.find(stu => stu.id == a.studentId);
-        divA.innerHTML += `<div class="alert-item"><b>${s?s.name:'?'}</b>: ${a.text}</div>`;
-    });
-
-    const divP = document.getElementById('dash-weekly-plan');
-    const tasks = appData.tasks.filter(t => isThisWeek(t.date));
-    divP.innerHTML = tasks.length ? '' : '<small>Nada esta semana.</small>';
-    tasks.forEach(t => {
-        const c = appData.classes.find(cl => cl.id == t.classId);
-        divP.innerHTML += `<div class="plan-item" style="border-color:${c?c.color:'#ccc'}"><b>${c?c.name:''}</b>: ${t.title}</div>`;
-    });
-    renderSchedule();
-}
-function isThisWeek(d) {
-    const date = new Date(d); const now = new Date();
-    const start = new Date(now.setDate(now.getDate() - now.getDay() + 1));
-    const end = new Date(now.setDate(now.getDate() + 6));
-    return date >= start && date <= end;
-}
-
-// ================= CLASES =================
-function renderClasses() {
-    const grid = document.getElementById('classesGrid'); grid.innerHTML = '';
-    appData.classes.forEach(c => {
-        const count = appData.students.filter(s => s.classId == c.id).length;
-        const card = document.createElement('div');
-        card.className = 'class-card';
-        card.style.borderTop = `5px solid ${c.color}`;
-        card.innerHTML = `<div style="font-size:2rem;margin-bottom:10px">${c.icon||'⚛️'}</div><h3>${c.name}</h3><small>${count} Alumnos</small>`;
-        card.onclick = () => openClassDetail(c.id);
-        grid.appendChild(card);
-    });
-}
-
-function openClassDetail(id) {
-    currentClassId = id;
-    const c = appData.classes.find(x => x.id == id);
-    document.getElementById('detailTitle').innerText = c.name;
-    document.getElementById('detailTitle').style.color = c.color;
-    nav('class-detail');
-    
-    // Preparar select de bitácora rápida (LOGBOOK DENTRO DE CLASE)
-    const sel = document.getElementById('classAnecStudent');
-    sel.innerHTML = '<option value="">-- Seleccionar Alumno --</option><option value="ALL">📢 TODA LA CLASE</option>';
-    appData.students.filter(s => s.classId == id).forEach(s => sel.innerHTML += `<option value="${s.id}">${s.name}</option>`);
-
-    renderStudents(); renderClassPlanning(); renderGradesView(); renderClassHistory(); 
-    renderClassLogbook(); // CARGAR BITÁCORA
-}
-
-// PESTAÑAS CLASE
-function openClassTab(id) {
+function openClassTab(tabId) {
     document.querySelectorAll('.class-tab-content').forEach(c => c.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    // Marcar botón activo
+    document.getElementById(tabId).classList.add('active');
     const btns = document.querySelectorAll('.tab-btn');
-    btns.forEach(b => { if(b.getAttribute('onclick').includes(id)) b.classList.add('active'); });
+    btns.forEach(b => { if(b.getAttribute('onclick').includes(tabId)) b.classList.add('active'); });
 }
 
-// ================= LOGBOOK EN CLASE (LO QUE PEDISTE ARREGLAR) =================
-function renderClassLogbook() {
-    const list = document.getElementById('classLogbookList'); list.innerHTML = '';
-    // Filtrar por esta clase
-    const logs = appData.anecdotes.filter(a => a.classId == currentClassId).reverse();
-    
-    if(!logs.length) { list.innerHTML = '<p style="text-align:center;color:#999">Sin entradas en la bitácora.</p>'; return; }
+function openNbTab(tabId) {
+    document.querySelectorAll('.nb-content').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('.nb-tab').forEach(b => b.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    const btns = document.querySelectorAll('.nb-tab');
+    btns.forEach(b => { if(b.getAttribute('onclick').includes(tabId)) b.classList.add('active'); });
+}
 
-    logs.forEach(a => {
-        const sName = a.studentId === 'ALL' ? 'TODA LA CLASE' : (appData.students.find(s=>s.id==a.studentId)?.name || '?');
-        list.innerHTML += `
-            <div class="anecdote-item ${a.importance}">
-                <div style="flex:1">
-                    <strong>${sName}</strong>: ${a.text} <br>
-                    <small style="opacity:0.7">${a.date}</small>
-                </div>
-                <button class="btn-act edit" onclick="fillClassAnecdoteForm(${a.id})">✏️</button>
-                <button class="btn-act del" onclick="deleteAnecdote(${a.id}, 'class')">🗑️</button>
-            </div>
-        `;
+// ================= DASHBOARD & SCHEDULE =================
+function updateDashboard() {
+    const adiv = document.getElementById('dash-alerts');
+    const alerts = appData.anecdotes.filter(a => a.importance === 'high');
+    adiv.innerHTML = alerts.length ? '' : '<small>Sin alertas críticas</small>';
+    alerts.forEach(a => {
+        const s = appData.students.find(x => x.id == a.studentId);
+        adiv.innerHTML += `<div style="padding:5px; border-bottom:1px solid #eee; color:red;">⚠️ <b>${s?s.name:'?'}</b>: ${a.text}</div>`;
+    });
+
+    const pdiv = document.getElementById('dash-weekly-plan');
+    const tasks = appData.tasks.slice(0, 5); 
+    pdiv.innerHTML = tasks.length ? '' : '<small>Sin tareas próximas</small>';
+    tasks.forEach(t => {
+        const c = appData.classes.find(x => x.id == t.classId);
+        pdiv.innerHTML += `<div style="padding:5px; border-bottom:1px solid #eee;">📅 <b>${t.title}</b> (${c?c.name:''})</div>`;
+    });
+
+    renderScheduleBoard();
+}
+
+function renderScheduleBoard() {
+    ['mon','tue','wed','thu','fri'].forEach(day => {
+        const div = document.getElementById(`sch-${day}`);
+        div.innerHTML = '';
+        const items = appData.schedule[day] || [];
+        items.sort((a,b) => a.start.localeCompare(b.start));
+        items.forEach((item, idx) => {
+            const c = appData.classes.find(x => x.id == item.classId);
+            div.innerHTML += `
+            <div class="sched-item" style="border-color:${c?c.color:appData.settings.theme}">
+                <b>${item.start}-${item.end}</b><br>${c?c.name:'?'}
+                <span style="position:absolute; top:2px; right:2px; cursor:pointer;" onclick="deleteSchedItem('${day}', ${idx})">×</span>
+            </div>`;
+        });
     });
 }
 
-// Rellenar formulario "in-situ"
-function fillClassAnecdoteForm(id) {
-    const a = appData.anecdotes.find(x => x.id == id);
-    if(!a) return;
-    
-    document.getElementById('classAnecStudent').value = a.studentId;
-    document.getElementById('classAnecImp').value = a.importance;
-    document.getElementById('classAnecText').value = a.text;
-    document.getElementById('editClassAnecId').value = a.id;
-    
-    // Cambiar UI de botones
-    document.getElementById('btnSaveClassAnec').innerHTML = '🔄 Actualizar Entrada';
-    document.getElementById('btnCancelClassAnec').style.display = 'inline-block';
-    
-    // Scroll arriba
-    document.getElementById('tab-logbook').scrollIntoView({behavior: 'smooth'});
+function openScheduleModal(day) {
+    document.getElementById('modalSchedule').style.display = 'flex';
+    document.getElementById('modalSchedule').dataset.day = day;
+    const sel = document.getElementById('schedClassSelect');
+    sel.innerHTML = '';
+    appData.classes.forEach(c => sel.innerHTML += `<option value="${c.id}">${c.name}</option>`);
 }
 
-function cancelClassAnecEdit() {
-    document.getElementById('classAnecText').value = '';
-    document.getElementById('classAnecStudent').value = '';
-    document.getElementById('editClassAnecId').value = '';
-    document.getElementById('btnSaveClassAnec').innerHTML = '💾 Guardar Entrada';
-    document.getElementById('btnCancelClassAnec').style.display = 'none';
-}
-
-function saveClassAnecdote() {
-    const sid = document.getElementById('classAnecStudent').value;
-    const txt = document.getElementById('classAnecText').value;
-    const imp = document.getElementById('classAnecImp').value;
-    const editId = document.getElementById('editClassAnecId').value;
-
-    if(!sid || !txt) return alert("Faltan datos (alumno o texto)");
-
-    if(editId) {
-        // ACTUALIZAR EXISTENTE
-        const a = appData.anecdotes.find(x => x.id == editId);
-        if(a) {
-            a.studentId = sid;
-            a.text = txt;
-            a.importance = imp;
-        }
-    } else {
-        // CREAR NUEVO
-        appData.anecdotes.push({
-            id: Date.now(),
-            classId: currentClassId,
-            studentId: sid,
-            text: txt,
-            importance: imp,
-            date: new Date().toLocaleDateString()
-        });
+function saveSchedule() {
+    const day = document.getElementById('modalSchedule').dataset.day;
+    const cid = document.getElementById('schedClassSelect').value;
+    const start = document.getElementById('schedStart').value;
+    const end = document.getElementById('schedEnd').value;
+    if(cid && start && end) {
+        if(!appData.schedule[day]) appData.schedule[day] = [];
+        appData.schedule[day].push({classId:cid, start, end});
+        saveLocal(); updateDashboard(); closeModal('modalSchedule');
     }
-
-    saveLocal();
-    cancelClassAnecEdit(); // Resetear formulario
-    renderClassLogbook();  // Refrescar lista visual
 }
-// ================= FIN LOGBOOK CLASE =================
+function deleteSchedItem(day, idx) {
+    appData.schedule[day].splice(idx, 1);
+    saveLocal(); updateDashboard();
+}
 
-// LOGICA GENERAL DE CLASE (Puntos, Notas, Planner)
-function renderStudents() {
-    const div = document.getElementById('studentsList'); div.innerHTML = '';
-    appData.students.filter(s => s.classId == currentClassId).forEach(s => {
-        div.innerHTML += `
-        <div class="student-card" id="card-${s.id}" onclick="toggleSelect(${s.id})">
-            <input type="checkbox" class="stu-check" value="${s.id}">
-            <b>${s.name}</b><br><span class="points-badge">${s.points} pts</span>
+// ================= CLASSES =================
+function renderClasses() {
+    const grid = document.getElementById('classesGrid');
+    grid.innerHTML = '';
+    appData.classes.forEach(c => {
+        const cnt = appData.students.filter(s => s.classId == c.id).length;
+        grid.innerHTML += `
+        <div class="class-card" onclick="openClassDetail(${c.id})" style="border-top-color:${c.color}">
+            <h3>${c.name}</h3>
+            <small>${cnt} Alumnos</small>
         </div>`;
     });
 }
-function toggleSelect(id) {
-    const chk = document.querySelector(`#card-${id} .stu-check`);
+
+function saveClass() {
+    const name = document.getElementById('modalClassName').value;
+    const color = document.getElementById('modalClassColor').value;
+    const editId = document.getElementById('modalEditClassId').value;
+    
+    if(name) {
+        if(editId) {
+            const c = appData.classes.find(x => x.id == editId);
+            c.name = name; c.color = color;
+        } else {
+            const newId = Date.now();
+            appData.classes.push({ id: newId, name, color });
+            appData.students.push({ id: Date.now()+1, classId: newId, name: 'Estudiante Ejemplo', points: 0 });
+        }
+        saveLocal(); renderClasses();
+        if(currentClassId) openClassDetail(currentClassId);
+        closeModal('modalClass');
+    }
+}
+
+function openClassDetail(cid) {
+    currentClassId = cid;
+    const c = appData.classes.find(x => x.id == cid);
+    document.getElementById('detailTitle').innerText = c.name;
+    nav('class-detail');
+    
+    renderStudents();
+    renderClassLogbook();
+    renderClassPlanning();
+    renderClassHistory();
+    
+    const sel = document.getElementById('localLogStudent');
+    sel.innerHTML = '<option value="">-- Alumno --</option>';
+    appData.students.filter(s => s.classId == cid).forEach(s => {
+        sel.innerHTML += `<option value="${s.id}">${s.name}</option>`;
+    });
+
+    openClassTab('tab-mgmt');
+}
+
+// ================= STUDENTS & POINTS =================
+function renderStudents() {
+    const div = document.getElementById('studentsList');
+    div.innerHTML = '';
+    appData.students.filter(s => s.classId == currentClassId).forEach(s => {
+        div.innerHTML += `
+        <div class="student-card" id="card-${s.id}" onclick="toggleStu(${s.id})">
+            <input type="checkbox" class="stu-checkbox" value="${s.id}">
+            <b>${s.name}</b><br>
+            <span style="color:var(--primary); font-weight:bold">${s.points} pts</span>
+        </div>`;
+    });
+}
+
+function toggleStu(id) {
+    const chk = document.querySelector(`#card-${id} .stu-checkbox`);
     chk.checked = !chk.checked;
     document.getElementById(`card-${id}`).classList.toggle('selected', chk.checked);
 }
 function toggleSelectAll() {
     const all = document.getElementById('selectAll').checked;
-    document.querySelectorAll('.stu-check').forEach(c => {
+    document.querySelectorAll('.stu-checkbox').forEach(c => {
         c.checked = all;
         document.getElementById(`card-${c.value}`).classList.toggle('selected', all);
     });
 }
-function applyPoints(n) {
-    const ids = Array.from(document.querySelectorAll('.stu-check:checked')).map(c => c.value);
-    if(!ids.length) return;
-    const r = document.getElementById('pointReason').value;
-    ids.forEach(id => {
-        const s = appData.students.find(x => x.id == id);
-        s.points += n;
-        appData.history.push({id:Date.now(), studentId:s.id, classId:currentClassId, text:r, pts:n, date:new Date().toLocaleDateString()});
+
+function applyPoints(pts) {
+    const reason = document.getElementById('pointReason').value;
+    const checked = document.querySelectorAll('.stu-checkbox:checked');
+    if(!checked.length) return alert("Selecciona alumnos");
+
+    checked.forEach(c => {
+        const s = appData.students.find(x => x.id == c.value);
+        s.points += pts;
+        appData.history.push({ id: Date.now(), classId: currentClassId, text: `${s.name}: ${reason}`, pts: pts, date: new Date().toLocaleDateString() });
     });
     saveLocal(); renderStudents(); renderClassHistory();
 }
-function applyCustomPoints() {
-    const v = parseInt(document.getElementById('customPointsInput').value);
-    if(v) applyPoints(v);
-}
-function renderClassPlanning() {
-    const div = document.getElementById('classWeeklyPlanList'); div.innerHTML = '';
-    appData.tasks.filter(t => t.classId == currentClassId && isThisWeek(t.date)).forEach(t => {
-        div.innerHTML += `<div class="task-item"><div><b>${t.title}</b><br><small>${t.date}</small></div></div>`;
-    });
-}
-function renderGradesView() {
-    const t = document.getElementById('gradesTableView');
-    const tasks = appData.tasks.filter(x => x.classId == currentClassId);
-    const studs = appData.students.filter(s => s.classId == currentClassId);
-    let h = '<thead><tr><th>Alumno</th>';
-    tasks.forEach(task => h += `<th>${task.title}</th>`);
-    h += '</tr></thead><tbody>';
-    studs.forEach(s => {
-        h += `<tr><td>${s.name}</td>`;
-        tasks.forEach(task => h += `<td>${(s.grades||{})[task.id] || '-'}</td>`);
-        h += '</tr>';
-    });
-    t.innerHTML = h + '</tbody>';
-}
-function renderClassHistory() {
-    const d = document.getElementById('classHistoryList');
-    const h = appData.history.filter(x => x.classId == currentClassId).reverse();
-    d.innerHTML = h.map(x => {
-        const s = appData.students.find(st => st.id == x.studentId);
-        return `<div style="display:flex;justify-content:space-between;padding:5px;border-bottom:1px solid #eee">
-            <span><b>${s?s.name:'?'}</b>: ${x.text}</span>
-            <span style="color:${x.pts>0?'green':'red'}">${x.pts>0?'+':''}${x.pts}</span>
+
+// ================= LOGBOOK LOCAL =================
+function renderClassLogbook() {
+    const list = document.getElementById('classLogbookList');
+    list.innerHTML = '';
+    const logs = appData.anecdotes.filter(a => a.classId == currentClassId).reverse();
+    if(!logs.length) { list.innerHTML = '<small style="display:block; text-align:center">Sin entradas.</small>'; return; }
+
+    logs.forEach(a => {
+        const s = appData.students.find(x => x.id == a.studentId);
+        list.innerHTML += `
+        <div class="anecdote-item ${a.importance}">
+            <div class="anec-content">
+                <strong>${s?s.name:'?'}</strong> <small>${a.date}</small><br>
+                <span>${a.text}</span>
+            </div>
+            <div class="anec-actions">
+                <button class="btn-icon-small edit" onclick="editLocalLog(${a.id})"><i class="fas fa-pen"></i></button>
+                <button class="btn-icon-small danger" onclick="deleteLog(${a.id}, 'local')"><i class="fas fa-trash"></i></button>
+            </div>
         </div>`;
-    }).join('');
+    });
+}
+
+function editLocalLog(id) {
+    const a = appData.anecdotes.find(x => x.id == id);
+    if(!a) return;
+    document.getElementById('localLogStudent').value = a.studentId;
+    document.getElementById('localLogImp').value = a.importance;
+    document.getElementById('localLogText').value = a.text;
+    document.getElementById('localLogEditId').value = a.id;
+    document.getElementById('btnSaveLocalLog').innerText = 'Actualizar';
+    document.getElementById('btnCancelLocalLog').style.display = 'inline-block';
+    document.querySelector('.logbook-form').scrollIntoView({behavior:'smooth'});
+}
+
+function saveLocalLog() {
+    const sid = document.getElementById('localLogStudent').value;
+    const imp = document.getElementById('localLogImp').value;
+    const txt = document.getElementById('localLogText').value;
+    const eid = document.getElementById('localLogEditId').value;
+    if(!sid || !txt) return alert("Faltan datos");
+
+    if(eid) {
+        const idx = appData.anecdotes.findIndex(x => x.id == eid);
+        if(idx > -1) { appData.anecdotes[idx] = { ...appData.anecdotes[idx], studentId: sid, importance: imp, text: txt }; }
+    } else {
+        appData.anecdotes.push({ id: Date.now(), classId: currentClassId, studentId: sid, importance: imp, text: txt, date: new Date().toLocaleDateString() });
+    }
+    saveLocal(); cancelLocalLog(); renderClassLogbook();
+}
+
+function cancelLocalLog() {
+    document.getElementById('localLogStudent').value = "";
+    document.getElementById('localLogText').value = "";
+    document.getElementById('localLogEditId').value = "";
+    document.getElementById('btnSaveLocalLog').innerText = 'Guardar';
+    document.getElementById('btnCancelLocalLog').style.display = 'none';
 }
 
 // ================= NOTEBOOK GLOBAL =================
 function initNotebook() {
-    // Poblar selects globales
-    ['taskClass','anecClass','gradebookClassSelect','adminStudentClass'].forEach(id => {
-        const sel = document.getElementById(id); sel.innerHTML = '<option value="">Clase...</option>';
-        appData.classes.forEach(c => sel.innerHTML += `<option value="${c.id}">${c.name}</option>`);
-    });
-    renderTasks(); renderGlobalLog(); renderStudentAdmin(); renderRewards();
-}
-function openNbTab(id) {
-    document.querySelectorAll('.nb-content').forEach(c => c.classList.remove('active'));
-    document.querySelectorAll('.nb-tab').forEach(b => b.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    // Activar botón visualmente
-    const btns = document.querySelectorAll('.nb-tab');
-    btns.forEach(b => { if(b.getAttribute('onclick').includes(id)) b.classList.add('active'); });
+    const tSel = document.getElementById('taskClass');
+    tSel.innerHTML = '';
+    appData.classes.forEach(c => tSel.innerHTML += `<option value="${c.id}">${c.name}</option>`);
+    renderTasks();
+
+    const gSel = document.getElementById('globalLogClass');
+    gSel.innerHTML = '<option value="">-- Clase --</option>';
+    appData.classes.forEach(c => gSel.innerHTML += `<option value="${c.id}">${c.name}</option>`);
+    renderGlobalLog();
+    renderRewards();
 }
 
-// PLANNER GLOBAL (Con Edición)
+function updateGlobalStudents() {
+    const cid = document.getElementById('globalLogClass').value;
+    const sSel = document.getElementById('globalLogStudent');
+    sSel.innerHTML = '';
+    sSel.disabled = !cid;
+    if(cid) {
+        appData.students.filter(s => s.classId == cid).forEach(s => sSel.innerHTML += `<option value="${s.id}">${s.name}</option>`);
+    }
+}
+
+function renderGlobalLog() {
+    const div = document.getElementById('globalLogList');
+    div.innerHTML = '';
+    appData.anecdotes.slice().reverse().forEach(a => {
+        const c = appData.classes.find(x => x.id == a.classId);
+        const s = appData.students.find(x => x.id == a.studentId);
+        div.innerHTML += `
+        <div class="anecdote-item ${a.importance}">
+            <div class="anec-content">
+                <small>${c?c.name:'?'}</small> <strong>${s?s.name:'?'}</strong><br>${a.text}
+            </div>
+            <div class="anec-actions">
+                <button class="btn-icon-small edit" onclick="editGlobalLog(${a.id})"><i class="fas fa-pen"></i></button>
+                <button class="btn-icon-small danger" onclick="deleteLog(${a.id}, 'global')"><i class="fas fa-trash"></i></button>
+            </div>
+        </div>`;
+    });
+}
+
+function editGlobalLog(id) {
+    const a = appData.anecdotes.find(x => x.id == id);
+    if(!a) return;
+    document.getElementById('globalLogClass').value = a.classId;
+    updateGlobalStudents();
+    document.getElementById('globalLogStudent').value = a.studentId;
+    document.getElementById('globalLogImp').value = a.importance;
+    document.getElementById('globalLogText').value = a.text;
+    document.getElementById('globalLogEditId').value = a.id;
+    document.getElementById('btnSaveGlobalLog').innerText = 'Actualizar';
+    document.getElementById('btnCancelGlobalLog').style.display = 'inline-block';
+    document.getElementById('nb-anec').scrollIntoView();
+}
+
+function saveGlobalLog() {
+    const cid = document.getElementById('globalLogClass').value;
+    const sid = document.getElementById('globalLogStudent').value;
+    const imp = document.getElementById('globalLogImp').value;
+    const txt = document.getElementById('globalLogText').value;
+    const eid = document.getElementById('globalLogEditId').value;
+    if(!cid || !sid || !txt) return alert("Faltan datos");
+
+    if(eid) {
+        const idx = appData.anecdotes.findIndex(x => x.id == eid);
+        if(idx > -1) { appData.anecdotes[idx] = { ...appData.anecdotes[idx], classId:cid, studentId:sid, importance:imp, text:txt }; }
+    } else {
+        appData.anecdotes.push({ id: Date.now(), classId:cid, studentId:sid, importance:imp, text:txt, date: new Date().toLocaleDateString() });
+    }
+    saveLocal(); cancelGlobalLog(); renderGlobalLog();
+}
+
+function cancelGlobalLog() {
+    document.getElementById('globalLogText').value = "";
+    document.getElementById('globalLogEditId').value = "";
+    document.getElementById('btnSaveGlobalLog').innerText = 'Registrar';
+    document.getElementById('btnCancelGlobalLog').style.display = 'none';
+}
+
+function deleteLog(id, origin) {
+    if(confirm('¿Eliminar?')) {
+        appData.anecdotes = appData.anecdotes.filter(a => a.id != id);
+        saveLocal();
+        if(origin === 'local') renderClassLogbook(); else renderGlobalLog();
+        updateDashboard();
+    }
+}
+
+// ================= PLANNER & REWARDS =================
 function addTask() {
-    const id = document.getElementById('editTaskId').value;
     const title = document.getElementById('taskTitle').value;
     const cid = document.getElementById('taskClass').value;
     const date = document.getElementById('taskDate').value;
-    if(!title || !cid || !date) return;
-
-    if(id) {
-        const t = appData.tasks.find(x => x.id == id);
-        if(t) { t.title = title; t.classId = cid; t.date = date; t.tag = document.getElementById('taskTag').value; t.description = document.getElementById('taskDesc').value; }
-    } else {
-        appData.tasks.push({id:Date.now(), title, classId:cid, date, tag:document.getElementById('taskTag').value, description:document.getElementById('taskDesc').value});
+    if(title && cid && date) {
+        appData.tasks.push({id:Date.now(), title, classId:cid, date, tag:document.getElementById('taskTag').value});
+        saveLocal(); renderTasks();
     }
-    saveLocal(); cancelTaskEdit(); renderTasks();
-}
-function editTask(id) {
-    const t = appData.tasks.find(x => x.id == id);
-    if(t) {
-        document.getElementById('taskTitle').value = t.title;
-        document.getElementById('taskClass').value = t.classId;
-        document.getElementById('taskDate').value = t.date;
-        document.getElementById('taskTag').value = t.tag;
-        document.getElementById('taskDesc').value = t.description;
-        document.getElementById('editTaskId').value = t.id;
-        document.getElementById('btnSaveTask').innerText = 'Actualizar Plan';
-        document.getElementById('btnCancelTask').style.display = 'block';
-    }
-}
-function cancelTaskEdit() {
-    document.getElementById('editTaskId').value = '';
-    document.getElementById('taskTitle').value = '';
-    document.getElementById('taskDesc').value = '';
-    document.getElementById('btnSaveTask').innerText = 'Guardar Plan';
-    document.getElementById('btnCancelTask').style.display = 'none';
-}
-function deleteTask(id) {
-    if(confirm('¿Borrar?')) { appData.tasks = appData.tasks.filter(x => x.id != id); saveLocal(); renderTasks(); }
 }
 function renderTasks() {
     const l = document.getElementById('tasksList'); l.innerHTML = '';
     appData.tasks.sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(t => {
         const c = appData.classes.find(x => x.id == t.classId);
-        l.innerHTML += `
-        <div class="task-item">
-            <div><b>${t.title}</b> <span class="tag-badge tag-${t.tag}">${t.tag}</span><br><small>${c?c.name:''}</small></div>
-            <div><button class="btn-act edit" onclick="editTask(${t.id})">✏️</button><button class="btn-act del" onclick="deleteTask(${t.id})">🗑️</button></div>
-        </div>`;
+        l.innerHTML += `<div class="anecdote-item"><div><b>${t.title}</b> (${c?c.name:''})<br><small>${t.date}</small></div></div>`;
     });
 }
-
-// BITÁCORA GLOBAL
-function updateAnecStudents() {
-    const cid = document.getElementById('anecClass').value;
-    const s = document.getElementById('anecStudent'); s.innerHTML = '<option value="ALL">Toda la clase</option>'; s.disabled = !cid;
-    if(cid) appData.students.filter(x => x.classId == cid).forEach(x => s.innerHTML += `<option value="${x.id}">${x.name}</option>`);
-}
-function saveAnecdote() {
-    const cid = document.getElementById('anecClass').value;
-    const sid = document.getElementById('anecStudent').value;
-    const txt = document.getElementById('anecText').value;
-    const imp = document.getElementById('anecImportance').value;
-    const editId = document.getElementById('editAnecId').value;
-    
-    if(!cid || !txt) return;
-
-    if(editId) {
-        const a = appData.anecdotes.find(x => x.id == editId);
-        if(a) { a.classId = cid; a.studentId = sid; a.text = txt; a.importance = imp; }
-    } else {
-        appData.anecdotes.push({id:Date.now(), classId:cid, studentId:sid, text:txt, importance:imp, date:new Date().toLocaleDateString()});
+function addReward() {
+    const name = document.getElementById('rewardName').value;
+    const cost = document.getElementById('rewardCost').value;
+    if(name && cost) {
+        appData.rewards.push({id:Date.now(), name, cost});
+        saveLocal(); renderRewards();
     }
-    saveLocal(); cancelAnecEdit(); renderGlobalLog();
-}
-function renderGlobalLog() {
-    const l = document.getElementById('notebookAnecdotesList'); l.innerHTML = '';
-    appData.anecdotes.slice().reverse().forEach(a => {
-        const c = appData.classes.find(x => x.id == a.classId);
-        const sName = a.studentId === 'ALL' ? 'Todos' : (appData.students.find(s=>s.id==a.studentId)?.name || '?');
-        l.innerHTML += `
-        <div class="anecdote-item ${a.importance}">
-            <div style="flex:1"><small>${c?c.name:''}</small><br><b>${sName}</b>: ${a.text}</div>
-            <button class="btn-act edit" onclick="editAnecdoteGlobal(${a.id})">✏️</button>
-            <button class="btn-act del" onclick="deleteAnecdote(${a.id}, 'global')">🗑️</button>
-        </div>`;
-    });
-}
-function editAnecdoteGlobal(id) {
-    const a = appData.anecdotes.find(x => x.id == id);
-    if(a) {
-        document.getElementById('anecClass').value = a.classId;
-        updateAnecStudents();
-        document.getElementById('anecStudent').value = a.studentId;
-        document.getElementById('anecText').value = a.text;
-        document.getElementById('anecImportance').value = a.importance;
-        document.getElementById('editAnecId').value = a.id;
-        document.getElementById('btnSaveAnec').innerText = 'Actualizar';
-        document.getElementById('btnCancelAnec').style.display = 'block';
-    }
-}
-function cancelAnecEdit() {
-    document.getElementById('anecText').value = '';
-    document.getElementById('editAnecId').value = '';
-    document.getElementById('btnSaveAnec').innerText = 'Registrar';
-    document.getElementById('btnCancelAnec').style.display = 'none';
-}
-// Función de borrado unificada
-function deleteAnecdote(id, origin) {
-    if(confirm('¿Borrar?')) {
-        appData.anecdotes = appData.anecdotes.filter(x => x.id != id);
-        saveLocal();
-        if(origin === 'class') renderClassLogbook();
-        else renderGlobalLog();
-    }
-}
-
-// GRADEBOOK GLOBAL
-function renderCentralGradebook() {
-    const cid = document.getElementById('gradebookClassSelect').value;
-    const div = document.getElementById('centralGradebookContainer');
-    if(!cid) return div.innerHTML = '';
-    const ts = appData.tasks.filter(t => t.classId == cid);
-    const ss = appData.students.filter(s => s.classId == cid);
-    let h = '<table class="data-table"><thead><tr><th>Alumno</th>';
-    ts.forEach(t => h+=`<th>${t.title}</th>`);
-    h += '</tr></thead><tbody>';
-    ss.forEach(s => {
-        h += `<tr><td><b>${s.name}</b></td>`;
-        ts.forEach(t => h += `<td><input type="number" style="width:50px" value="${(s.grades||{})[t.id]||''}" onchange="updateGrade(${s.id},${t.id},this.value)"></td>`);
-        h += '</tr>';
-    });
-    div.innerHTML = h + '</tbody></table>';
-}
-function updateGrade(sid, tid, val) {
-    const s = appData.students.find(x => x.id == sid);
-    if(!s.grades) s.grades = {};
-    s.grades[tid] = val;
-    saveLocal();
-}
-
-// ADMIN ALUMNOS
-function saveStudentAdmin() {
-    const cid = document.getElementById('adminStudentClass').value;
-    const nom = document.getElementById('adminStudentName').value;
-    if(cid && nom) {
-        appData.students.push({id:Date.now(), classId:cid, name:nom, points:0, grades:{}});
-        document.getElementById('adminStudentName').value = '';
-        saveLocal(); renderStudentAdmin();
-    }
-}
-function renderStudentAdmin() {
-    const l = document.getElementById('adminStudentsList'); l.innerHTML = '';
-    appData.classes.forEach(c => {
-        const ss = appData.students.filter(s => s.classId == c.id);
-        if(ss.length) {
-            l.innerHTML += `<h4>${c.name}</h4>`;
-            ss.forEach(s => l.innerHTML += `<div class="admin-student-item">${s.name} <button class="btn-act del" onclick="delStu(${s.id})">🗑️</button></div>`);
-        }
-    });
-}
-function delStu(id) { if(confirm('¿Borrar alumno?')) { appData.students = appData.students.filter(x => x.id != id); saveLocal(); renderStudentAdmin(); } }
-
-// SHOP (TIENDA)
-function saveReward() {
-    const n = document.getElementById('rewardName').value;
-    const c = document.getElementById('rewardCost').value;
-    if(n&&c) { appData.rewards.push({id:Date.now(), name:n, cost:c}); saveLocal(); renderRewards(); }
 }
 function renderRewards() {
-    const d = document.getElementById('rewardsConfigList'); d.innerHTML = '';
-    appData.rewards.forEach(r => d.innerHTML += `<div style="border:1px solid #eee;padding:5px">${r.name} (${r.cost})</div>`);
+    const d = document.getElementById('rewardsList'); d.innerHTML = '';
+    appData.rewards.forEach(r => d.innerHTML += `<div style="border:1px solid #ddd; padding:5px; text-align:center">${r.name}<br><b>${r.cost} pts</b></div>`);
+}
+
+// ================= CONFIG & CLOUD (PANTRY) =================
+function openProfileModal() {
+    document.getElementById('profName').value = appData.settings.name;
+    document.getElementById('profTheme').value = appData.settings.theme;
+    document.getElementById('pantryId').value = appData.settings.pantryId || '';
+    document.getElementById('modalProfile').style.display = 'flex';
+}
+
+function saveProfile() {
+    appData.settings.name = document.getElementById('profName').value;
+    appData.settings.theme = document.getElementById('profTheme').value;
+    appData.settings.pantryId = document.getElementById('pantryId').value;
+    
+    applySettings();
+    saveLocal();
+    closeModal('modalProfile');
+}
+
+function applySettings() {
+    document.getElementById('sidebarName').innerText = appData.settings.name;
+    document.documentElement.style.setProperty('--primary', appData.settings.theme);
+    // Actualizar estado visual
+    const status = document.getElementById('syncStatus');
+    if(appData.settings.pantryId) status.innerText = "☁️ Nube Activada";
+    else status.innerText = "☁️ Offline";
+}
+
+function resetTheme() {
+    document.getElementById('profTheme').value = '#3b82f6';
+}
+
+// --- CLOUD SYNC LOGIC ---
+async function cloudSync(action, silent = false) {
+    const pid = appData.settings.pantryId;
+    if(!pid) return !silent && alert("Introduce tu Pantry ID primero");
+    
+    const url = `${PANTRY_BASE}${pid}/basket/${BASKET_NAME}`;
+    const btn = document.getElementById('syncStatus');
+    btn.innerText = "☁️ Sincronizando...";
+
+    try {
+        if(action === 'push') {
+            await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(appData)
+            });
+            if(!silent) alert("Datos guardados en la nube ✅");
+        } else {
+            const res = await fetch(url);
+            if(!res.ok) throw new Error("No hay datos o ID erróneo");
+            const data = await res.json();
+            appData = { ...appData, ...data }; // Merge seguro
+            saveLocal();
+            applySettings();
+            nav('dashboard'); // Refrescar todo
+            if(!silent) alert("Datos cargados de la nube ✅");
+        }
+        btn.innerText = "☁️ Sincronizado";
+    } catch(e) {
+        console.error(e);
+        btn.innerText = "☁️ Error";
+        if(!silent) alert("Error de conexión: " + e.message);
+    }
+}
+
+// --- EXCEL EXPORT LOGIC ---
+function exportExcel() {
+    let table = `
+    <html>
+    <head><meta charset="UTF-8"></head>
+    <body>
+    <h2>Reporte de Alumnos - ${appData.settings.name}</h2>
+    <table border="1">
+        <thead>
+            <tr style="background:#ddd;">
+                <th>ID</th><th>Nombre</th><th>Clase</th><th>Puntos</th>
+            </tr>
+        </thead>
+        <tbody>`;
+    
+    appData.students.forEach(s => {
+        const c = appData.classes.find(x => x.id == s.classId);
+        table += `<tr>
+            <td>${s.id}</td>
+            <td>${s.name}</td>
+            <td>${c ? c.name : 'Sin clase'}</td>
+            <td>${s.points}</td>
+        </tr>`;
+    });
+
+    table += `</tbody></table>
+    <h3>Historial Reciente</h3>
+    <table border="1">
+        <thead><tr style="background:#ddd;"><th>Fecha</th><th>Clase</th><th>Detalle</th><th>Pts</th></tr></thead>
+        <tbody>`;
+        
+    appData.history.slice().reverse().forEach(h => {
+        const c = appData.classes.find(x => x.id == h.classId);
+        table += `<tr>
+            <td>${h.date}</td>
+            <td>${c ? c.name : '-'}</td>
+            <td>${h.text}</td>
+            <td>${h.pts}</td>
+        </tr>`;
+    });
+    
+    table += `</tbody></table></body></html>`;
+
+    const blob = new Blob([table], { type: 'application/vnd.ms-excel' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Reporte_Docente_${new Date().toLocaleDateString()}.xls`;
+    a.click();
+}
+
+// ================= UTILS & OTHERS =================
+function saveLocal() { localStorage.setItem('TeacherAppV12_7', JSON.stringify(appData)); }
+function loadLocal() {
+    const d = localStorage.getItem('TeacherAppV12_7');
+    if(d) appData = { ...appData, ...JSON.parse(d) };
+}
+
+function openClassModal() {
+    document.getElementById('modalClass').style.display = 'flex';
+    document.getElementById('modalClassName').value = '';
+    document.getElementById('modalEditClassId').value = '';
+}
+function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+function editCurrentClass() {
+    const c = appData.classes.find(x => x.id == currentClassId);
+    document.getElementById('modalClassName').value = c.name;
+    document.getElementById('modalClassColor').value = c.color;
+    document.getElementById('modalEditClassId').value = c.id;
+    document.getElementById('modalClass').style.display = 'flex';
+}
+function deleteCurrentClass() {
+    if(confirm('¿Borrar clase? Se perderá todo.')) {
+        appData.classes = appData.classes.filter(x => x.id != currentClassId);
+        appData.students = appData.students.filter(x => x.classId != currentClassId);
+        appData.anecdotes = appData.anecdotes.filter(x => x.classId != currentClassId);
+        appData.tasks = appData.tasks.filter(x => x.classId != currentClassId);
+        saveLocal(); nav('classes');
+    }
+}
+function renderClassPlanning() {
+    const div = document.getElementById('classWeeklyPlanList'); div.innerHTML = '';
+    appData.tasks.filter(t => t.classId == currentClassId).forEach(t => {
+        div.innerHTML += `<div class="anecdote-item"><b>${t.title}</b> (${t.date})</div>`;
+    });
+}
+function renderClassHistory() {
+    const div = document.getElementById('classHistoryList'); div.innerHTML = '';
+    appData.history.filter(h => h.classId == currentClassId).reverse().forEach(h => {
+        div.innerHTML += `<div style="padding:5px; border-bottom:1px solid #eee"><small>${h.date}</small> ${h.text} <b style="color:${h.pts>0?'green':'red'}">${h.pts}</b></div>`;
+    });
 }
 function openRedeemModal() {
-    const g = document.getElementById('redeemGrid'); g.innerHTML = '';
-    appData.rewards.forEach(r => {
-        g.innerHTML += `<div style="border:1px solid #eee;padding:10px;text-align:center;cursor:pointer" onclick="redeem('${r.name}',${r.cost})"><b>${r.name}</b><br>${r.cost} pts</div>`;
-    });
     document.getElementById('modalRedeem').style.display = 'flex';
+    const grid = document.getElementById('redeemGrid');
+    grid.innerHTML = '';
+    appData.rewards.forEach(r => {
+        grid.innerHTML += `<div class="student-card" onclick="redeemPrize('${r.name}', ${r.cost})"><b>${r.name}</b><br>${r.cost} pts</div>`;
+    });
 }
-function redeem(name, cost) {
-    const ids = Array.from(document.querySelectorAll('.stu-check:checked')).map(c => c.value);
-    if(!ids.length) return alert('Selecciona alumnos primero');
-    if(confirm(`¿Canjear ${name} por ${cost} pts a ${ids.length} alumnos?`)) {
-        ids.forEach(id => {
-            const s = appData.students.find(x => x.id == id);
+function redeemPrize(name, cost) {
+    const checked = document.querySelectorAll('.stu-checkbox:checked');
+    if(!checked.length) return alert('Selecciona alumnos');
+    if(confirm(`Canjear ${name} por ${cost} pts?`)) {
+        checked.forEach(chk => {
+            const s = appData.students.find(x => x.id == chk.value);
             if(s.points >= cost) {
                 s.points -= cost;
-                appData.history.push({id:Date.now(), studentId:s.id, classId:currentClassId, text:`Canje: ${name}`, pts:-cost, date:new Date().toLocaleDateString()});
+                appData.history.push({id:Date.now(), classId:currentClassId, text:`Canje: ${name}`, pts:-cost, date:new Date().toLocaleDateString()});
             }
         });
         saveLocal(); renderStudents(); renderClassHistory(); closeModal('modalRedeem');
     }
 }
-
-// UTILIDADES MODALES
-function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-function openClassModal() { document.getElementById('modalClass').style.display = 'flex'; loadColorPicker(); }
-function loadColorPicker() {
-    const d = document.getElementById('classColorPicker'); d.innerHTML = '';
-    ['#3b82f6','#ef4444','#10b981','#f59e0b','#8b5cf6'].forEach(c => {
-        d.innerHTML += `<div class="cp-option" style="background:${c}" onclick="document.getElementById('selectedColor').value='${c}'"></div>`;
-    });
-}
-function saveClass() {
-    const n = document.getElementById('modalClassName').value;
-    if(n) {
-        const id = document.getElementById('editClassId').value;
-        if(id) {
-            const c = appData.classes.find(x => x.id == id);
-            c.name = n; c.icon = document.getElementById('modalClassIcon').value || '⚛️'; c.color = document.getElementById('selectedColor').value;
-        } else {
-            appData.classes.push({id:Date.now(), name:n, icon:document.getElementById('modalClassIcon').value||'⚛️', color:document.getElementById('selectedColor').value});
-        }
-        saveLocal(); renderClasses(); closeModal('modalClass');
-    }
-}
-function editCurrentClass() {
-    const c = appData.classes.find(x => x.id == currentClassId);
-    document.getElementById('modalClassName').value = c.name;
-    document.getElementById('editClassId').value = c.id;
-    document.getElementById('modalClass').style.display = 'flex';
-}
-function deleteCurrentClass() {
-    if(confirm('¿Borrar clase y alumnos?')) {
-        appData.classes = appData.classes.filter(x => x.id != currentClassId);
-        appData.students = appData.students.filter(x => x.classId != currentClassId);
-        saveLocal(); nav('classes');
-    }
-}
-
-// HORARIO
-function openScheduleModal(d) {
-    document.getElementById('modalSchedule').style.display = 'flex';
-    document.getElementById('modalSchedule').dataset.day = d;
-    const s = document.getElementById('schedClassSelect'); s.innerHTML = '';
-    appData.classes.forEach(c => s.innerHTML += `<option value="${c.id}">${c.name}</option>`);
-}
-function saveScheduleItem() {
-    const d = document.getElementById('modalSchedule').dataset.day;
-    const cid = document.getElementById('schedClassSelect').value;
-    const st = document.getElementById('schedTimeStart').value;
-    const en = document.getElementById('schedTimeEnd').value;
-    if(cid && st && en) {
-        if(!appData.schedule[d]) appData.schedule[d] = [];
-        appData.schedule[d].push({classId:cid, start:st, end:en});
-        saveLocal(); updateDashboard(); closeModal('modalSchedule');
-    }
-}
-function renderSchedule() {
-    ['mon','tue','wed','thu','fri'].forEach(d => {
-        const div = document.getElementById(`sch-${d}`); div.innerHTML = '';
-        (appData.schedule[d]||[]).sort((a,b)=>a.start.localeCompare(b.start)).forEach((x,i) => {
-            const c = appData.classes.find(cl => cl.id == x.classId);
-            div.innerHTML += `<div class="sched-item" style="background:${c?c.color:'#ccc'}">
-                ${x.start}-${x.end}<br><b>${c?c.name:'?'}</b>
-                <span style="float:right;cursor:pointer" onclick="delSched('${d}',${i})">×</span>
-            </div>`;
-        });
-    });
-}
-function delSched(d, i) { appData.schedule[d].splice(i, 1); saveLocal(); updateDashboard(); }
