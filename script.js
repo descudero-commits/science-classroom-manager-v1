@@ -1,6 +1,6 @@
 // ================= DATA & INIT =================
 let appData = {
-    settings: { name: 'Docente', theme: '#3b82f6', pantryId: '9df76c09-c878-45e6-9df9-7b02d9cd00ef' },
+    settings: { name: 'Docente', theme: '#3b82f6', pantryId: '', lang: 'es' },
     classes: [], 
     students: [], 
     tasks: [], 
@@ -15,12 +15,54 @@ let currentClassId = null;
 const PANTRY_BASE = "https://getpantry.cloud/apiv1/pantry/";
 const BASKET_NAME = "teacherAppV12";
 
+// TRANSLATION DICTIONARY
+const translations = {
+    es: {
+        sidebarConfig: "⚙️ Configuración", navDash: "Dashboard", navClasses: "Mis Clases", navNotebook: "Notebook Global",
+        dashTitle: "Panel de Control", dashAlerts: "⚠️ Alertas Críticas", dashAgenda: "📅 Agenda Semanal", dashSchedule: "Horario de Clases",
+        mon: "Lunes", tue: "Martes", wed: "Miércoles", thu: "Jueves", fri: "Viernes",
+        btnNewClass: "+ Nueva Clase", btnBack: "Volver",
+        tabMgmt: "🎮 Gestión", tabPlan: "📅 Planificación", tabHist: "📜 Historial", tabLog: "📖 Bitácora",
+        optPart: "Participación", optHw: "Tarea", optBeh: "Conducta", optMat: "Material", btnRedeem: "🎁 Canjear",
+        logNew: "📝 Nueva Entrada / Editar", logHist: "Historial de Clase", btnSave: "Guardar", btnCancel: "Cancelar",
+        nbPlanner: "📅 Planner", nbLog: "📖 Bitácora Global", nbShop: "🛍️ Tienda",
+        taskNew: "Nueva Tarea", btnAdd: "Añadir", logGlobalTitle: "Registro Global", btnCreate: "Crear",
+        lblName: "👤 Tu Nombre", lblLang: "🌍 Idioma / Language", lblTheme: "🎨 Color del Tema", btnReset: "Restaurar",
+        cloudHelp: "Pega tu ID para sincronizar.", btnLoadCloud: "Descargar Nube", btnSaveCloud: "Subir a Nube",
+        lblReport: "📊 Reportes", btnExcel: "Descargar Excel", btnSaveConfig: "Guardar Configuración", btnClose: "Cerrar",
+        schedAdd: "Añadir Bloque",
+        alertNoId: "Por favor introduce tu Pantry ID primero.",
+        syncSuccess: "¡Sincronización Exitosa!", syncError: "Error de conexión.",
+        studentsStr: "Alumnos"
+    },
+    en: {
+        sidebarConfig: "⚙️ Settings", navDash: "Dashboard", navClasses: "My Classes", navNotebook: "Global Notebook",
+        dashTitle: "Dashboard", dashAlerts: "⚠️ Critical Alerts", dashAgenda: "📅 Weekly Agenda", dashSchedule: "Class Schedule",
+        mon: "Monday", tue: "Tuesday", wed: "Wednesday", thu: "Thursday", fri: "Friday",
+        btnNewClass: "+ New Class", btnBack: "Back",
+        tabMgmt: "🎮 Management", tabPlan: "📅 Planning", tabHist: "📜 History", tabLog: "📖 Logbook",
+        optPart: "Participation", optHw: "Homework", optBeh: "Behavior", optMat: "Material", btnRedeem: "🎁 Redeem",
+        logNew: "📝 New Entry / Edit", logHist: "Class History", btnSave: "Save", btnCancel: "Cancel",
+        nbPlanner: "📅 Planner", nbLog: "📖 Global Log", nbShop: "🛍️ Shop",
+        taskNew: "New Task", btnAdd: "Add", logGlobalTitle: "Global Record", btnCreate: "Create",
+        lblName: "👤 Your Name", lblLang: "🌍 Language", lblTheme: "🎨 Theme Color", btnReset: "Reset",
+        cloudHelp: "Paste your ID to sync.", btnLoadCloud: "Download from Cloud", btnSaveCloud: "Save to Cloud",
+        lblReport: "📊 Reports", btnExcel: "Download Excel", btnSaveConfig: "Save Settings", btnClose: "Close",
+        schedAdd: "Add Block",
+        alertNoId: "Please enter your Pantry ID first.",
+        syncSuccess: "Sync Successful!", syncError: "Connection Error.",
+        studentsStr: "Students"
+    }
+};
+
+// Helper function to get text
+function t(key) { return translations[appData.settings.lang][key] || key; }
+
 document.addEventListener('DOMContentLoaded', () => {
     loadLocal();
     applySettings();
     nav('dashboard');
-    // Intentar auto-sync si hay ID
-    if(appData.settings.pantryId) cloudSync('pull', true);
+    if(appData.settings.pantryId) cloudSync('pull', true); // Intentar sync silencioso al inicio
 });
 
 // ================= NAVIGATION =================
@@ -56,7 +98,7 @@ function openNbTab(tabId) {
 function updateDashboard() {
     const adiv = document.getElementById('dash-alerts');
     const alerts = appData.anecdotes.filter(a => a.importance === 'high');
-    adiv.innerHTML = alerts.length ? '' : '<small>Sin alertas críticas</small>';
+    adiv.innerHTML = alerts.length ? '' : `<small>${appData.settings.lang==='es'?'Sin alertas':'No alerts'}</small>`;
     alerts.forEach(a => {
         const s = appData.students.find(x => x.id == a.studentId);
         adiv.innerHTML += `<div style="padding:5px; border-bottom:1px solid #eee; color:red;">⚠️ <b>${s?s.name:'?'}</b>: ${a.text}</div>`;
@@ -64,7 +106,7 @@ function updateDashboard() {
 
     const pdiv = document.getElementById('dash-weekly-plan');
     const tasks = appData.tasks.slice(0, 5); 
-    pdiv.innerHTML = tasks.length ? '' : '<small>Sin tareas próximas</small>';
+    pdiv.innerHTML = tasks.length ? '' : `<small>${appData.settings.lang==='es'?'Sin tareas':'No tasks'}</small>`;
     tasks.forEach(t => {
         const c = appData.classes.find(x => x.id == t.classId);
         pdiv.innerHTML += `<div style="padding:5px; border-bottom:1px solid #eee;">📅 <b>${t.title}</b> (${c?c.name:''})</div>`;
@@ -123,7 +165,7 @@ function renderClasses() {
         grid.innerHTML += `
         <div class="class-card" onclick="openClassDetail(${c.id})" style="border-top-color:${c.color}">
             <h3>${c.name}</h3>
-            <small>${cnt} Alumnos</small>
+            <small>${cnt} ${t('studentsStr')}</small>
         </div>`;
     });
 }
@@ -140,7 +182,7 @@ function saveClass() {
         } else {
             const newId = Date.now();
             appData.classes.push({ id: newId, name, color });
-            appData.students.push({ id: Date.now()+1, classId: newId, name: 'Estudiante Ejemplo', points: 0 });
+            appData.students.push({ id: Date.now()+1, classId: newId, name: 'Student 1', points: 0 });
         }
         saveLocal(); renderClasses();
         if(currentClassId) openClassDetail(currentClassId);
@@ -160,7 +202,7 @@ function openClassDetail(cid) {
     renderClassHistory();
     
     const sel = document.getElementById('localLogStudent');
-    sel.innerHTML = '<option value="">-- Alumno --</option>';
+    sel.innerHTML = '<option value="">-- --</option>';
     appData.students.filter(s => s.classId == cid).forEach(s => {
         sel.innerHTML += `<option value="${s.id}">${s.name}</option>`;
     });
@@ -198,7 +240,7 @@ function toggleSelectAll() {
 function applyPoints(pts) {
     const reason = document.getElementById('pointReason').value;
     const checked = document.querySelectorAll('.stu-checkbox:checked');
-    if(!checked.length) return alert("Selecciona alumnos");
+    if(!checked.length) return;
 
     checked.forEach(c => {
         const s = appData.students.find(x => x.id == c.value);
@@ -213,7 +255,7 @@ function renderClassLogbook() {
     const list = document.getElementById('classLogbookList');
     list.innerHTML = '';
     const logs = appData.anecdotes.filter(a => a.classId == currentClassId).reverse();
-    if(!logs.length) { list.innerHTML = '<small style="display:block; text-align:center">Sin entradas.</small>'; return; }
+    if(!logs.length) { list.innerHTML = '<small style="display:block; text-align:center">-</small>'; return; }
 
     logs.forEach(a => {
         const s = appData.students.find(x => x.id == a.studentId);
@@ -238,7 +280,7 @@ function editLocalLog(id) {
     document.getElementById('localLogImp').value = a.importance;
     document.getElementById('localLogText').value = a.text;
     document.getElementById('localLogEditId').value = a.id;
-    document.getElementById('btnSaveLocalLog').innerText = 'Actualizar';
+    document.getElementById('btnSaveLocalLog').innerText = t('btnSave');
     document.getElementById('btnCancelLocalLog').style.display = 'inline-block';
     document.querySelector('.logbook-form').scrollIntoView({behavior:'smooth'});
 }
@@ -248,7 +290,7 @@ function saveLocalLog() {
     const imp = document.getElementById('localLogImp').value;
     const txt = document.getElementById('localLogText').value;
     const eid = document.getElementById('localLogEditId').value;
-    if(!sid || !txt) return alert("Faltan datos");
+    if(!sid || !txt) return;
 
     if(eid) {
         const idx = appData.anecdotes.findIndex(x => x.id == eid);
@@ -263,7 +305,7 @@ function cancelLocalLog() {
     document.getElementById('localLogStudent').value = "";
     document.getElementById('localLogText').value = "";
     document.getElementById('localLogEditId').value = "";
-    document.getElementById('btnSaveLocalLog').innerText = 'Guardar';
+    document.getElementById('btnSaveLocalLog').innerText = t('btnSave');
     document.getElementById('btnCancelLocalLog').style.display = 'none';
 }
 
@@ -275,7 +317,7 @@ function initNotebook() {
     renderTasks();
 
     const gSel = document.getElementById('globalLogClass');
-    gSel.innerHTML = '<option value="">-- Clase --</option>';
+    gSel.innerHTML = '<option value="">-- --</option>';
     appData.classes.forEach(c => gSel.innerHTML += `<option value="${c.id}">${c.name}</option>`);
     renderGlobalLog();
     renderRewards();
@@ -319,7 +361,7 @@ function editGlobalLog(id) {
     document.getElementById('globalLogImp').value = a.importance;
     document.getElementById('globalLogText').value = a.text;
     document.getElementById('globalLogEditId').value = a.id;
-    document.getElementById('btnSaveGlobalLog').innerText = 'Actualizar';
+    document.getElementById('btnSaveGlobalLog').innerText = t('btnSave');
     document.getElementById('btnCancelGlobalLog').style.display = 'inline-block';
     document.getElementById('nb-anec').scrollIntoView();
 }
@@ -330,7 +372,7 @@ function saveGlobalLog() {
     const imp = document.getElementById('globalLogImp').value;
     const txt = document.getElementById('globalLogText').value;
     const eid = document.getElementById('globalLogEditId').value;
-    if(!cid || !sid || !txt) return alert("Faltan datos");
+    if(!cid || !sid || !txt) return;
 
     if(eid) {
         const idx = appData.anecdotes.findIndex(x => x.id == eid);
@@ -344,12 +386,12 @@ function saveGlobalLog() {
 function cancelGlobalLog() {
     document.getElementById('globalLogText').value = "";
     document.getElementById('globalLogEditId').value = "";
-    document.getElementById('btnSaveGlobalLog').innerText = 'Registrar';
+    document.getElementById('btnSaveGlobalLog').innerText = t('btnSave');
     document.getElementById('btnCancelGlobalLog').style.display = 'none';
 }
 
 function deleteLog(id, origin) {
-    if(confirm('¿Eliminar?')) {
+    if(confirm('Delete?')) {
         appData.anecdotes = appData.anecdotes.filter(a => a.id != id);
         saveLocal();
         if(origin === 'local') renderClassLogbook(); else renderGlobalLog();
@@ -405,12 +447,28 @@ function saveProfile() {
     closeModal('modalProfile');
 }
 
+function changeLang(l) {
+    appData.settings.lang = l;
+    updateLanguageUI();
+    renderClasses(); // Refresh dynamic text
+    updateDashboard();
+}
+
+function updateLanguageUI() {
+    document.querySelectorAll('[data-translate]').forEach(el => {
+        const key = el.dataset.translate;
+        if(translations[appData.settings.lang][key]) {
+            el.innerText = translations[appData.settings.lang][key];
+        }
+    });
+}
+
 function applySettings() {
     document.getElementById('sidebarName').innerText = appData.settings.name;
     document.documentElement.style.setProperty('--primary', appData.settings.theme);
-    // Actualizar estado visual
+    updateLanguageUI();
     const status = document.getElementById('syncStatus');
-    if(appData.settings.pantryId) status.innerText = "☁️ Nube Activada";
+    if(appData.settings.pantryId) status.innerText = "☁️ " + (appData.settings.lang==='es' ? "Nube OK" : "Cloud OK");
     else status.innerText = "☁️ Offline";
 }
 
@@ -421,11 +479,12 @@ function resetTheme() {
 // --- CLOUD SYNC LOGIC ---
 async function cloudSync(action, silent = false) {
     const pid = appData.settings.pantryId;
-    if(!pid) return !silent && alert("Introduce tu Pantry ID primero");
+    const btnId = action === 'push' ? 'btnSaveCloud' : 'btnLoadCloud';
+    if(!pid) return !silent && alert(t('alertNoId'));
     
     const url = `${PANTRY_BASE}${pid}/basket/${BASKET_NAME}`;
-    const btn = document.getElementById('syncStatus');
-    btn.innerText = "☁️ Sincronizando...";
+    const status = document.getElementById('syncStatus');
+    status.innerText = "☁️ ...";
 
     try {
         if(action === 'push') {
@@ -434,80 +493,49 @@ async function cloudSync(action, silent = false) {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(appData)
             });
-            if(!silent) alert("Datos guardados en la nube ✅");
+            if(!silent) alert(t('syncSuccess'));
         } else {
             const res = await fetch(url);
-            if(!res.ok) throw new Error("No hay datos o ID erróneo");
+            if(!res.ok) throw new Error("No data");
             const data = await res.json();
-            appData = { ...appData, ...data }; // Merge seguro
+            appData = { ...appData, ...data };
             saveLocal();
             applySettings();
-            nav('dashboard'); // Refrescar todo
-            if(!silent) alert("Datos cargados de la nube ✅");
+            nav('dashboard');
+            if(!silent) alert(t('syncSuccess'));
         }
-        btn.innerText = "☁️ Sincronizado";
+        status.innerText = "☁️ OK";
     } catch(e) {
         console.error(e);
-        btn.innerText = "☁️ Error";
-        if(!silent) alert("Error de conexión: " + e.message);
+        status.innerText = "☁️ Err";
+        if(!silent) alert(t('syncError'));
     }
 }
 
 // --- EXCEL EXPORT LOGIC ---
 function exportExcel() {
     let table = `
-    <html>
-    <head><meta charset="UTF-8"></head>
-    <body>
-    <h2>Reporte de Alumnos - ${appData.settings.name}</h2>
-    <table border="1">
-        <thead>
-            <tr style="background:#ddd;">
-                <th>ID</th><th>Nombre</th><th>Clase</th><th>Puntos</th>
-            </tr>
-        </thead>
-        <tbody>`;
-    
+    <html><head><meta charset="UTF-8"></head><body>
+    <h2>Report - ${appData.settings.name}</h2>
+    <table border="1"><thead><tr style="background:#ddd;"><th>ID</th><th>Name</th><th>Class</th><th>Points</th></tr></thead><tbody>`;
     appData.students.forEach(s => {
         const c = appData.classes.find(x => x.id == s.classId);
-        table += `<tr>
-            <td>${s.id}</td>
-            <td>${s.name}</td>
-            <td>${c ? c.name : 'Sin clase'}</td>
-            <td>${s.points}</td>
-        </tr>`;
+        table += `<tr><td>${s.id}</td><td>${s.name}</td><td>${c ? c.name : '-'}</td><td>${s.points}</td></tr>`;
     });
-
-    table += `</tbody></table>
-    <h3>Historial Reciente</h3>
-    <table border="1">
-        <thead><tr style="background:#ddd;"><th>Fecha</th><th>Clase</th><th>Detalle</th><th>Pts</th></tr></thead>
-        <tbody>`;
-        
-    appData.history.slice().reverse().forEach(h => {
-        const c = appData.classes.find(x => x.id == h.classId);
-        table += `<tr>
-            <td>${h.date}</td>
-            <td>${c ? c.name : '-'}</td>
-            <td>${h.text}</td>
-            <td>${h.pts}</td>
-        </tr>`;
-    });
-    
     table += `</tbody></table></body></html>`;
 
     const blob = new Blob([table], { type: 'application/vnd.ms-excel' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `Reporte_Docente_${new Date().toLocaleDateString()}.xls`;
+    a.download = `Report_${new Date().toLocaleDateString()}.xls`;
     a.click();
 }
 
 // ================= UTILS & OTHERS =================
-function saveLocal() { localStorage.setItem('TeacherAppV12_7', JSON.stringify(appData)); }
+function saveLocal() { localStorage.setItem('TeacherAppV12_8', JSON.stringify(appData)); }
 function loadLocal() {
-    const d = localStorage.getItem('TeacherAppV12_7');
+    const d = localStorage.getItem('TeacherAppV12_8');
     if(d) appData = { ...appData, ...JSON.parse(d) };
 }
 
@@ -526,7 +554,7 @@ function editCurrentClass() {
     document.getElementById('modalClass').style.display = 'flex';
 }
 function deleteCurrentClass() {
-    if(confirm('¿Borrar clase? Se perderá todo.')) {
+    if(confirm('Delete?')) {
         appData.classes = appData.classes.filter(x => x.id != currentClassId);
         appData.students = appData.students.filter(x => x.classId != currentClassId);
         appData.anecdotes = appData.anecdotes.filter(x => x.classId != currentClassId);
@@ -556,8 +584,8 @@ function openRedeemModal() {
 }
 function redeemPrize(name, cost) {
     const checked = document.querySelectorAll('.stu-checkbox:checked');
-    if(!checked.length) return alert('Selecciona alumnos');
-    if(confirm(`Canjear ${name} por ${cost} pts?`)) {
+    if(!checked.length) return;
+    if(confirm(`Canjear ${name} (${cost} pts)?`)) {
         checked.forEach(chk => {
             const s = appData.students.find(x => x.id == chk.value);
             if(s.points >= cost) {
