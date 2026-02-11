@@ -3,144 +3,163 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teacher Manager v13 Pro</title>
+    <title>Teacher OS v14</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="app-container">
+<div class="layout">
     
     <aside class="sidebar">
-        <div class="brand">
-            <i class="fas fa-layer-group"></i> TeacherOS
+        <div class="logo">
+            <i class="fas fa-shapes"></i> <span>Titanium v14</span>
         </div>
-        
-        <div class="profile-widget" onclick="openConfigModal()">
+
+        <div class="user-card" onclick="openConfigModal()">
             <div class="avatar">Pro</div>
-            <div class="info">
-                <h4 id="sidebarName">Docente</h4>
-                <small>Configuración & Nube</small>
+            <div class="user-info">
+                <h4 id="lblProfileName">Docente</h4>
+                <small>Configuración ⚙️</small>
             </div>
         </div>
-        
-        <nav class="nav-menu">
-            <button onclick="nav('dashboard')" id="nav-dashboard" class="active"><i class="fas fa-chart-pie"></i> Dashboard</button>
-            <button onclick="nav('notebook')" id="nav-notebook" class="highlight-btn"><i class="fas fa-book-open"></i> Notebook (Admin)</button>
-            <div class="nav-divider">MIS CLASES</div>
-            <div id="sidebar-classes-list"></div>
-            <button onclick="openCreateClassModal()" class="add-class-btn"><i class="fas fa-plus"></i> Nueva Clase</button>
+
+        <nav class="menu">
+            <p class="menu-label">PRINCIPAL</p>
+            <button onclick="nav('dashboard')" id="nav-dashboard" class="active">
+                <i class="fas fa-home"></i> Dashboard
+            </button>
+            <button onclick="nav('notebook')" id="nav-notebook" class="special-btn">
+                <i class="fas fa-book-journal-whills"></i> <b>Notebook (Admin)</b>
+            </button>
+
+            <p class="menu-label">MIS CLASES (VISTA)</p>
+            <div id="sidebarClassList">
+                </div>
+            <button onclick="openModal('modalClass')" class="add-btn"><i class="fas fa-plus"></i> Nueva Clase</button>
         </nav>
-        
-        <div class="sidebar-footer">
-            <small id="syncStatus">☁️ Offline</small>
+
+        <div class="status-bar">
+            <span id="cloudStatus">☁️ Offline</span>
         </div>
     </aside>
 
-    <main class="main-content">
-        
-        <section id="view-dashboard" class="view active">
-            <header>
-                <h1>Resumen Semanal</h1>
-                <p>Tu cronograma y alertas</p>
+    <main class="content">
+
+        <section id="view-dashboard" class="page active">
+            <header class="page-header">
+                <h1>Panel de Control</h1>
+                <p>Resumen de tu semana y alertas</p>
             </header>
-            
+
             <div class="dashboard-grid">
                 <div class="card full-width">
-                    <div class="card-header">
+                    <div class="card-head">
                         <h3>📅 Horario Semanal</h3>
-                        <button onclick="openScheduleModal()" class="btn-text">Editar</button>
+                        <button onclick="openScheduleEditor()" class="btn-text">Editar Horario</button>
                     </div>
-                    <div class="schedule-grid" id="dashboardSchedule">
-                        </div>
+                    <div class="week-grid" id="dashSchedule"></div>
                 </div>
 
                 <div class="card">
-                    <h3>📢 Últimas Bitácoras</h3>
-                    <div id="dash-logs" class="list-scroll"></div>
+                    <h3>📌 Próximas Entregas/Eventos</h3>
+                    <div id="dashPlannerList" class="simple-list"></div>
                 </div>
 
                 <div class="card">
-                    <h3>📌 Próximas Tareas</h3>
-                    <div id="dash-planner" class="list-scroll"></div>
+                    <h3>📢 Últimas Incidencias</h3>
+                    <div id="dashLogList" class="simple-list"></div>
                 </div>
             </div>
         </section>
 
-        <section id="view-notebook" class="view">
-            <header>
+        <section id="view-notebook" class="page">
+            <header class="page-header">
                 <h1>Notebook Global</h1>
-                <p>Centro de mando: Estudiantes, Notas y Planificación</p>
+                <p>Gestiona todo desde aquí: Alumnos, Notas y Planificación.</p>
             </header>
 
-            <div class="tabs">
-                <button class="tab-btn active" onclick="setNbTab('nb-students')">👥 Estudiantes</button>
-                <button class="tab-btn" onclick="setNbTab('nb-gradebook')">🎓 Gradebook (Notas)</button>
-                <button class="tab-btn" onclick="setNbTab('nb-planning')">📅 Planning</button>
-                <button class="tab-btn" onclick="setNbTab('nb-logbook')">📖 Bitácora Maestra</button>
+            <div class="tabs-container">
+                <button class="tab active" onclick="switchNbTab('tab-nb-students')">👥 Estudiantes</button>
+                <button class="tab" onclick="switchNbTab('tab-nb-gradebook')">📊 Gradebook (Notas)</button>
+                <button class="tab" onclick="switchNbTab('tab-nb-planning')">📅 Planning</button>
+                <button class="tab" onclick="switchNbTab('tab-nb-logs')">📖 Bitácora Maestra</button>
             </div>
 
-            <div id="nb-students" class="nb-tab-content active">
+            <div id="tab-nb-students" class="tab-content active">
                 <div class="toolbar">
-                    <select id="nbStudentClassSelect" onchange="renderNbStudents()">
+                    <select id="filterStudentClass" onchange="renderStudents()"></select>
+                    <button onclick="openModal('modalStudent')" class="btn-primary">+ Agregar Alumno</button>
+                </div>
+                <div id="studentsTable" class="table-responsive"></div>
+            </div>
+
+            <div id="tab-nb-gradebook" class="tab-content">
+                <div class="toolbar">
+                    <select id="filterGradebookClass" onchange="renderGradebook()"></select>
+                    <button onclick="openModal('modalAssignment')" class="btn-primary">+ Nueva Columna (Actividad)</button>
+                </div>
+                <div class="alert-box">💡 Edita las notas directamente en las celdas. Se guardan automáticamente.</div>
+                <div id="gradebookContainer" class="excel-container"></div>
+            </div>
+
+            <div id="tab-nb-planning" class="tab-content">
+                <div class="toolbar">
+                    <select id="filterPlanClass" onchange="renderPlanning()">
                         <option value="">Todas las clases</option>
                     </select>
-                    <button onclick="openAddStudentModal()" class="btn-primary">+ Alumno</button>
+                    <button onclick="openModal('modalPlanning')" class="btn-primary">+ Nuevo Evento</button>
                 </div>
-                <div id="nbStudentList" class="table-container"></div>
+                <div id="planningGrid" class="cards-grid"></div>
             </div>
 
-            <div id="nb-gradebook" class="nb-tab-content">
+            <div id="tab-nb-logs" class="tab-content">
                 <div class="toolbar">
-                    <select id="nbGradebookClassSelect" onchange="renderNbGradebook()"></select>
-                    <button onclick="openAddAssignmentModal()" class="btn-primary">+ Columna (Actividad)</button>
+                    <button onclick="openLogModal()" class="btn-primary">+ Nueva Entrada Bitácora</button>
                 </div>
-                <div class="gradebook-wrapper" id="nbGradebookTable">
-                    </div>
-            </div>
-
-            <div id="nb-planning" class="nb-tab-content">
-                <div class="toolbar">
-                    <button onclick="openAddPlanModal()" class="btn-primary">+ Planificación</button>
-                </div>
-                <div id="nbPlanningList" class="cards-grid"></div>
-            </div>
-
-            <div id="nb-logbook" class="nb-tab-content">
-                <div class="toolbar">
-                    <button onclick="openLogbookModal()" class="btn-primary">+ Nueva Entrada</button>
-                </div>
-                <div id="nbLogbookList" class="timeline"></div>
+                <div id="globalLogsList" class="timeline"></div>
             </div>
         </section>
 
-        <section id="view-class" class="view">
-            <header class="class-header">
+        <section id="view-class" class="page">
+            <header class="page-header">
                 <div>
-                    <h1 id="clsTitle">Clase</h1>
-                    <small id="clsSubtitle">Vista de Clase</small>
+                    <h1 id="viewClassTitle">Clase</h1>
+                    <p>Vista de Clase</p>
                 </div>
-                <div class="header-actions">
-                    <button onclick="toggleAttendance()" class="btn-secondary">🙋‍♂️ Pasar Asistencia</button>
+                <div>
+                    <button onclick="toggleAttendance()" class="btn-secondary">🙋‍♂️ Tomar Asistencia</button>
+                    <button onclick="deleteCurrentClass()" class="btn-danger-outline"><i class="fas fa-trash"></i></button>
                 </div>
             </header>
 
-            <div class="class-dashboard-grid">
-                <div id="attendanceWidget" class="card full-width" style="display:none; background:#f0f9ff; border-color:#bae6fd;">
-                    <h3>Asistencia de Hoy</h3>
-                    <div id="attendanceList" class="attendance-grid"></div>
-                    <button onclick="saveAttendance()" class="btn-primary small" style="margin-top:10px;">Guardar</button>
+            <div id="attendanceWidget" class="attendance-panel" style="display:none;">
+                <h3>Asistencia: <span id="attDate">Hoy</span></h3>
+                <div id="attList" class="att-grid"></div>
+                <div class="att-footer">
+                    <button onclick="saveAttendance()" class="btn-primary small">Guardar Asistencia</button>
+                    <button onclick="toggleAttendance()" class="btn-text small">Cerrar</button>
+                </div>
+            </div>
+
+            <div class="class-cols">
+                <div class="col-left">
+                    <div class="card">
+                        <h3>📊 Calificaciones (Lectura)</h3>
+                        <div id="classGradebookView" class="readonly-table"></div>
+                    </div>
+                    <div class="card">
+                        <h3>📅 Próximos Eventos de esta Clase</h3>
+                        <div id="classPlanningView" class="simple-list"></div>
+                    </div>
                 </div>
 
-                <div class="card">
-                    <h3>📊 Calificaciones (Vista)</h3>
-                    <div id="clsGradebookView" class="simple-table-container"></div>
-                </div>
-
-                <div class="card">
-                    <h3>📖 Bitácora de Clase</h3>
-                    <div id="clsLogbookView" class="timeline"></div>
+                <div class="col-right">
+                    <div class="card">
+                        <h3>📖 Historial de Bitácora</h3>
+                        <div id="classLogbookView" class="timeline"></div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -148,33 +167,117 @@
     </main>
 </div>
 
-<div id="modalConfig" class="modal">
+<div id="modalConfig" class="modal-overlay">
     <div class="modal-box">
         <h3>Configuración</h3>
-        <label>Nombre del Docente</label>
+        <label>Nombre del Profesor</label>
         <input type="text" id="cfgName">
-        
         <hr>
-        <label>Sincronización en Nube (Pantry)</label>
-        <div class="row-btns">
-            <button onclick="cloudSync('pull')" class="btn-secondary">📥 Descargar Datos</button>
+        <label>Nube Pantry (ID requerido en script)</label>
+        <div class="btn-row">
+            <button onclick="cloudSync('pull')" class="btn-secondary">📥 Bajar Datos</button>
             <button onclick="cloudSync('push')" class="btn-primary">📤 Subir Datos</button>
         </div>
-        <small class="hint">Asegúrate de configurar el PANTRY_ID en el script.</small>
-        
-        <hr>
-        <button onclick="saveConfig()" class="btn-primary full">Guardar</button>
-        <button onclick="closeModal('modalConfig')" class="btn-flat full">Cerrar</button>
+        <div class="modal-footer">
+            <button onclick="saveConfig()" class="btn-primary full">Guardar</button>
+            <button onclick="closeModal('modalConfig')" class="btn-flat full">Cancelar</button>
+        </div>
     </div>
 </div>
 
-<div id="modalGeneric" class="modal">
+<div id="modalClass" class="modal-overlay">
     <div class="modal-box">
-        <h3 id="modalTitle">Título</h3>
-        <div id="modalBody"></div>
+        <h3>Nueva Clase</h3>
+        <input type="text" id="newClassName" placeholder="Nombre (ej. Matemáticas 5A)">
         <div class="modal-footer">
-            <button id="modalActionBtn" class="btn-primary">Guardar</button>
-            <button onclick="closeModal('modalGeneric')" class="btn-flat">Cancelar</button>
+            <button onclick="addClass()" class="btn-primary">Crear</button>
+            <button onclick="closeModal('modalClass')" class="btn-flat">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<div id="modalStudent" class="modal-overlay">
+    <div class="modal-box">
+        <h3>Agregar Alumno</h3>
+        <input type="text" id="newStudName" placeholder="Nombre Completo">
+        <label>Asignar a clase:</label>
+        <select id="newStudClass"></select>
+        <div class="modal-footer">
+            <button onclick="addStudent()" class="btn-primary">Guardar</button>
+            <button onclick="closeModal('modalStudent')" class="btn-flat">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<div id="modalAssignment" class="modal-overlay">
+    <div class="modal-box">
+        <h3>Nueva Actividad (Columna)</h3>
+        <input type="text" id="newAssTitle" placeholder="Título (ej. Examen 1)">
+        <input type="text" id="newAssTag" placeholder="Etiqueta corta (ej. P1)">
+        <label>Para la clase:</label>
+        <select id="newAssClass"></select>
+        <div class="modal-footer">
+            <button onclick="addAssignment()" class="btn-primary">Crear Columna</button>
+            <button onclick="closeModal('modalAssignment')" class="btn-flat">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<div id="modalPlanning" class="modal-overlay">
+    <div class="modal-box">
+        <h3>Planificar Evento</h3>
+        <input type="text" id="planTitle" placeholder="Título (ej. Entrega de Proyecto)">
+        <div class="row-inputs">
+            <input type="date" id="planDate">
+            <input type="text" id="planTag" placeholder="Tipo (ej. Examen, Tarea...)">
+        </div>
+        <label>Clase:</label>
+        <select id="planClass"></select>
+        <textarea id="planDesc" placeholder="Detalles..."></textarea>
+        <div class="modal-footer">
+            <button onclick="addPlanning()" class="btn-primary">Guardar</button>
+            <button onclick="closeModal('modalPlanning')" class="btn-flat">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<div id="modalLog" class="modal-overlay">
+    <div class="modal-box">
+        <h3>Entrada de Bitácora</h3>
+        <input type="hidden" id="logId"> <label>Alumno:</label>
+        <select id="logStudent"></select>
+        <label>Importancia:</label>
+        <select id="logImp">
+            <option value="low">🟢 Info / Positivo</option>
+            <option value="medium">🟠 Observación</option>
+            <option value="high">🔴 Alerta / Incidencia</option>
+        </select>
+        <textarea id="logText" rows="4" placeholder="¿Qué sucedió?"></textarea>
+        <div class="modal-footer">
+            <button onclick="saveLog()" class="btn-primary">Guardar Entrada</button>
+            <button onclick="closeModal('modalLog')" class="btn-flat">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<div id="modalSchedule" class="modal-overlay">
+    <div class="modal-box">
+        <h3>Agregar Bloque Horario</h3>
+        <label>Día:</label>
+        <select id="schDay">
+            <option value="Lunes">Lunes</option><option value="Martes">Martes</option>
+            <option value="Miércoles">Miércoles</option><option value="Jueves">Jueves</option>
+            <option value="Viernes">Viernes</option>
+        </select>
+        <label>Clase:</label>
+        <select id="schClass"></select>
+        <div class="row-inputs">
+            <input type="time" id="schStart">
+            <input type="time" id="schEnd">
+        </div>
+        <div class="modal-footer">
+            <button onclick="addScheduleItem()" class="btn-primary">Añadir</button>
+            <button onclick="closeModal('modalSchedule')" class="btn-flat">Cerrar</button>
         </div>
     </div>
 </div>
