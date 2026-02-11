@@ -1,9 +1,124 @@
 // ==========================================
-// 1. CONFIGURACIÓN
+// 1. CONFIGURACIÓN & TRADUCCIONES
 // ==========================================
-const PANTRY_ID = "9df76c09-c878-45e6-9df9-7b02d9cd00ef"; // <--- CAMBIAR ID
+const PANTRY_ID = "PON_TU_ID_AQUI"; 
 const BUCKET_NAME = "ScienceTeacherV11";
 const CLOUD_URL = `https://getpantry.cloud/apiv1/pantry/${PANTRY_ID}/basket/${BUCKET_NAME}`;
+
+const translations = {
+    es: {
+        sidebar_config: "⚙️ Configuración",
+        nav_dash: "Dashboard",
+        nav_classes: "Mis Clases",
+        nav_notebook: "Notebook & Admin",
+        dash_title: "Panel de Control",
+        dash_alerts: "Alertas",
+        dash_weekly: "Agenda Semanal",
+        dash_schedule: "Horario Semanal",
+        day_mon: "Lunes", day_tue: "Martes", day_wed: "Miércoles", day_thu: "Jueves", day_fri: "Viernes",
+        classes_title: "Laboratorio de Clases",
+        btn_new_class: "+ Nueva Clase",
+        drag_hint: "💡 Arrastra las tarjetas para reordenarlas",
+        tab_points: "🎮 Puntos", tab_planning: "📅 Planificación", tab_grades: "📊 Notas", tab_history: "📜 Historial",
+        lbl_all: "Todos",
+        reason_part: "Participación", reason_hw: "Tarea Completa", reason_beh: "Conducta", reason_lab: "Buen Laboratorio", reason_mat: "Material",
+        btn_redeem: "🎁 Canjear",
+        plan_week_title: "Plan para esta Semana",
+        grades_hint: "✏️ Para editar notas, ve al <b>Notebook > Gradebook</b>.",
+        nb_title: "Notebook del Docente",
+        nb_tab_planner: "📅 Planner", nb_tab_hist: "📜 Historial Global", nb_tab_grade: "📝 Gradebook", nb_tab_admin: "👥 Admin Alumnos", nb_tab_shop: "🛍️ Tienda", nb_tab_log: "📖 Bitácora",
+        planner_new: "Nueva Actividad / Lección",
+        ph_task_title: "Título (ej. Reacción Redox)",
+        tag_lesson: "📖 Lección", tag_test: "📝 Test", tag_hw: "🏠 Tarea", tag_proj: "🧪 Proyecto", tag_quiz: "⚡ Quiz",
+        ph_period: "Periodo (ej. Trim 1)",
+        ph_desc: "Descripción (ej. Pág 45-50...)",
+        btn_save_plan: "Guardar Plan", btn_cancel: "Cancelar",
+        ph_search_stu: "Buscar alumno...",
+        lbl_sel_class: "Selecciona Clase:",
+        ph_stu_name: "Nombre Alumno", btn_add: "Añadir",
+        ph_reward: "Premio", btn_create: "Crear",
+        imp_low: "🟢 Baja (Info)", imp_med: "🟠 Media (Aviso)", imp_high: "🔴 Alta (Crítico)",
+        ph_incident: "Detalle del incidente...", btn_register: "Registrar",
+        modal_config_title: "Configuración Global",
+        sec_profile: "👤 Mi Perfil", ph_your_name: "Tu Nombre", btn_update_prof: "Actualizar Perfil",
+        sec_data: "📂 Datos y Nube",
+        btn_excel: "Descargar Excel", btn_upload: "Subir a Nube", btn_download: "Bajar de Nube",
+        sec_theme: "🎨 Tema", btn_close: "Cerrar",
+        modal_class_title: "Nueva Clase", ph_class_name: "Nombre (ej. Física 1A)", icon_hint: "Iconos sugeridos: ⚛️ 🧪 🧬 🔭 🔬 🔌 🧲 🪐 🦠",
+        lbl_color: "Color:", btn_save: "Guardar",
+        modal_sched_title: "Añadir al Horario", lbl_start: "Inicio", lbl_end: "Fin", btn_save_block: "Guardar Bloque",
+        modal_redeem_title: "🎁 Canjear Premio",
+        // Dynamic JS Strings
+        txt_nothing_week: "Nada esta semana.",
+        txt_nothing_here: "No hay premios.",
+        txt_confirm_del: "¿Borrar?",
+        txt_confirm_redeem: "¿Canjear?",
+        txt_select_stu: "Selecciona alumnos.",
+        txt_saved: "✅ Guardado.",
+        txt_error: "❌ Error.",
+        txt_students: "Alumnos",
+        txt_empty: "Sin datos.",
+        txt_class: "Clase...",
+        txt_all_class: "📢 TODA LA CLASE",
+        txt_student: "Estudiante", txt_date: "Fecha", txt_reason: "Razón", txt_pts: "Pts"
+    },
+    en: {
+        sidebar_config: "⚙️ Settings",
+        nav_dash: "Dashboard",
+        nav_classes: "My Classes",
+        nav_notebook: "Notebook & Admin",
+        dash_title: "Dashboard",
+        dash_alerts: "Alerts",
+        dash_weekly: "Weekly Agenda",
+        dash_schedule: "Weekly Schedule",
+        day_mon: "Monday", day_tue: "Tuesday", day_wed: "Wednesday", day_thu: "Thursday", day_fri: "Friday",
+        classes_title: "Class Lab",
+        btn_new_class: "+ New Class",
+        drag_hint: "💡 Drag cards to reorder",
+        tab_points: "🎮 Points", tab_planning: "📅 Planning", tab_grades: "📊 Grades", tab_history: "📜 History",
+        lbl_all: "All",
+        reason_part: "Participation", reason_hw: "Homework", reason_beh: "Behavior", reason_lab: "Good Lab", reason_mat: "Material",
+        btn_redeem: "🎁 Redeem",
+        plan_week_title: "Plan for this Week",
+        grades_hint: "✏️ To edit grades, go to <b>Notebook > Gradebook</b>.",
+        nb_title: "Teacher Notebook",
+        nb_tab_planner: "📅 Planner", nb_tab_hist: "📜 Global History", nb_tab_grade: "📝 Gradebook", nb_tab_admin: "👥 Students Admin", nb_tab_shop: "🛍️ Shop", nb_tab_log: "📖 Logbook",
+        planner_new: "New Activity / Lesson",
+        ph_task_title: "Title (e.g. Redox Reaction)",
+        tag_lesson: "📖 Lesson", tag_test: "📝 Test", tag_hw: "🏠 Homework", tag_proj: "🧪 Project", tag_quiz: "⚡ Quiz",
+        ph_period: "Period (e.g. Term 1)",
+        ph_desc: "Description (e.g. Pg 45-50...)",
+        btn_save_plan: "Save Plan", btn_cancel: "Cancel",
+        ph_search_stu: "Search student...",
+        lbl_sel_class: "Select Class:",
+        ph_stu_name: "Student Name", btn_add: "Add",
+        ph_reward: "Reward", btn_create: "Create",
+        imp_low: "🟢 Low (Info)", imp_med: "🟠 Medium (Warning)", imp_high: "🔴 High (Critical)",
+        ph_incident: "Incident details...", btn_register: "Register",
+        modal_config_title: "Global Settings",
+        sec_profile: "👤 My Profile", ph_your_name: "Your Name", btn_update_prof: "Update Profile",
+        sec_data: "📂 Data & Cloud",
+        btn_excel: "Download Excel", btn_upload: "Upload to Cloud", btn_download: "Download from Cloud",
+        sec_theme: "🎨 Theme", btn_close: "Close",
+        modal_class_title: "New Class", ph_class_name: "Name (e.g. Physics 1A)", icon_hint: "Suggested icons: ⚛️ 🧪 🧬 🔭 🔬 🔌 🧲 🪐 🦠",
+        lbl_color: "Color:", btn_save: "Save",
+        modal_sched_title: "Add to Schedule", lbl_start: "Start", lbl_end: "End", btn_save_block: "Save Block",
+        modal_redeem_title: "🎁 Redeem Reward",
+        // Dynamic JS Strings
+        txt_nothing_week: "Nothing this week.",
+        txt_nothing_here: "No rewards here.",
+        txt_confirm_del: "Delete?",
+        txt_confirm_redeem: "Redeem?",
+        txt_select_stu: "Select students first.",
+        txt_saved: "✅ Saved.",
+        txt_error: "❌ Error.",
+        txt_students: "Students",
+        txt_empty: "No data.",
+        txt_class: "Class...",
+        txt_all_class: "📢 WHOLE CLASS",
+        txt_student: "Student", txt_date: "Date", txt_reason: "Reason", txt_pts: "Pts"
+    }
+};
 
 // ==========================================
 // 2. ESTADO GLOBAL
@@ -12,7 +127,8 @@ let appData = {
     settings: { 
         themeColor: '#3b82f6',
         teacherName: 'Profesor',
-        teacherAvatar: '👨‍🔬'
+        teacherAvatar: '👨‍🔬',
+        language: 'es' // Nuevo campo de idioma
     },
     classes: [],    
     students: [],   
@@ -26,15 +142,53 @@ let appData = {
 let currentClassId = null;
 let currentDay = null;
 
+// Helper de traducción
+function t(key) {
+    const lang = appData.settings.language || 'es';
+    return translations[lang][key] || key;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     loadLocal();
     applyTheme(appData.settings.themeColor);
     updateProfileUI();
-    document.getElementById('currentDate').innerText = new Date().toLocaleDateString('es-ES', { 
-        weekday: 'long', day: 'numeric', month: 'long' 
-    });
+    updateLanguageUI();
     nav('dashboard');
 });
+
+// Idioma
+function toggleLanguage() {
+    appData.settings.language = appData.settings.language === 'es' ? 'en' : 'es';
+    saveLocal();
+    updateLanguageUI();
+    // Refrescar vistas para aplicar cambios dinámicos
+    nav('dashboard'); 
+    renderClasses();
+    initNotebook();
+}
+
+function updateLanguageUI() {
+    const lang = appData.settings.language || 'es';
+    document.getElementById('currentLangDisplay').innerText = lang === 'es' ? 'Español' : 'English';
+    document.documentElement.lang = lang;
+
+    // Traducir elementos estáticos del DOM
+    document.querySelectorAll('[data-translate]').forEach(el => {
+        const key = el.getAttribute('data-translate');
+        if(translations[lang][key]) {
+            if(el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                el.placeholder = translations[lang][key];
+            } else {
+                el.innerHTML = translations[lang][key];
+            }
+        }
+    });
+
+    // Actualizar fecha header
+    const dateOpts = { weekday: 'long', day: 'numeric', month: 'long' };
+    const locale = lang === 'es' ? 'es-ES' : 'en-US';
+    document.getElementById('currentDate').innerText = new Date().toLocaleDateString(locale, dateOpts);
+}
 
 // Tema
 function applyTheme(color) {
@@ -44,9 +198,9 @@ function applyTheme(color) {
 function setTheme(color) { applyTheme(color); }
 
 // Persistencia
-function saveLocal() { localStorage.setItem('ScienceV11', JSON.stringify(appData)); }
+function saveLocal() { localStorage.setItem('ScienceV12', JSON.stringify(appData)); }
 function loadLocal() {
-    const s = localStorage.getItem('ScienceV11');
+    const s = localStorage.getItem('ScienceV12'); // Actualizado a V12 para evitar conflictos viejos
     if(s) {
         const parsed = JSON.parse(s);
         appData = { ...appData, ...parsed, settings: { ...appData.settings, ...parsed.settings } };
@@ -112,17 +266,9 @@ function nav(viewId) {
 
 // Dashboard
 function updateDashboard() {
-    const top = [...appData.students].sort((a,b) => b.points - a.points).slice(0,5);
-    const topContainer = document.getElementById('dash-top');
-    topContainer.innerHTML = top.length ? '' : '<small>Sin datos.</small>';
-    top.forEach((s, index) => {
-        const c = appData.classes.find(cl => cl.id == s.classId);
-        topContainer.innerHTML += `<div style="padding:5px; border-bottom:1px solid #eee;">${index+1}. <b>${s.name}</b> <small>(${c?c.name:''})</small> <span style="float:right;">${s.points} pts</span></div>`;
-    });
-
     const alerts = appData.anecdotes.filter(a => a.importance === 'high');
     const alertContainer = document.getElementById('dash-alerts');
-    alertContainer.innerHTML = alerts.length ? '' : '<small style="color:#aaa">Todo en orden.</small>';
+    alertContainer.innerHTML = alerts.length ? '' : `<small style="color:#aaa">${t('txt_empty')}</small>`;
     alerts.forEach(a => {
         const s = appData.students.find(stu => stu.id == a.studentId);
         alertContainer.innerHTML += `<div class="alert-item"><b>${s ? s.name : 'General'}</b>: ${a.text}</div>`;
@@ -130,10 +276,10 @@ function updateDashboard() {
 
     const planContainer = document.getElementById('dash-weekly-plan');
     const weeklyTasks = appData.tasks.filter(t => isDateInCurrentWeek(t.date)).sort((a,b) => new Date(a.date) - new Date(b.date));
-    planContainer.innerHTML = weeklyTasks.length ? '' : '<small style="color:#aaa">Nada esta semana.</small>';
-    weeklyTasks.forEach(t => {
-        const c = appData.classes.find(cl => cl.id == t.classId);
-        planContainer.innerHTML += `<div class="plan-item" style="border-left-color:${c ? c.color : '#ccc'}"><div><b>${c ? c.name : '?'}</b>: ${t.title}</div><small>${t.description || ''}</small></div>`;
+    planContainer.innerHTML = weeklyTasks.length ? '' : `<small style="color:#aaa">${t('txt_nothing_week')}</small>`;
+    weeklyTasks.forEach(tk => {
+        const c = appData.classes.find(cl => cl.id == tk.classId);
+        planContainer.innerHTML += `<div class="plan-item" style="border-left-color:${c ? c.color : '#ccc'}"><div><b>${c ? c.name : '?'}</b>: ${tk.title}</div><small>${tk.description || ''}</small></div>`;
     });
     renderScheduleView();
 }
@@ -154,7 +300,7 @@ function renderScheduleView() {
 function openScheduleModal(day) {
     currentDay = day;
     const sel = document.getElementById('schedClassSelect'); 
-    sel.innerHTML = '<option value="">-- Materia --</option>';
+    sel.innerHTML = `<option value="">-- ${t('txt_class')} --</option>`;
     appData.classes.forEach(c => sel.innerHTML += `<option value="${c.id}">${c.name}</option>`);
     document.getElementById('modalSchedule').style.display = 'flex';
 }
@@ -168,7 +314,7 @@ function saveScheduleItem() {
     }
 }
 function delSched(day, idx) {
-    if(confirm("¿Quitar?")) { appData.schedule[day].splice(idx, 1); saveLocal(); renderScheduleView(); }
+    if(confirm(t('txt_confirm_del'))) { appData.schedule[day].splice(idx, 1); saveLocal(); renderScheduleView(); }
 }
 
 // ==========================================
@@ -180,23 +326,21 @@ function renderClasses() {
     
     appData.classes.forEach((c, index) => {
         const count = appData.students.filter(s => s.classId == c.id).length;
-        const icon = c.icon || '⚛️'; // Icono por defecto
+        const icon = c.icon || '⚛️';
         
-        // Creamos elemento con Drag attributes
         const card = document.createElement('div');
         card.className = 'class-card';
         card.style.borderTop = `5px solid ${c.color}`;
         card.draggable = true;
-        card.dataset.index = index; // Guardamos índice
+        card.dataset.index = index;
         card.innerHTML = `
             <div style="font-size:2.5rem; margin-bottom:10px;">${icon}</div>
             <h3>${c.name}</h3>
-            <small>${count} Alumnos</small>
+            <small>${count} ${t('txt_students')}</small>
         `;
         
         card.onclick = (e) => { if(!card.classList.contains('dragging')) openClassDetail(c.id); };
         
-        // Eventos Drag
         card.addEventListener('dragstart', dragStart);
         card.addEventListener('dragover', dragOver);
         card.addEventListener('drop', dragDrop);
@@ -231,7 +375,6 @@ function dragEnd(e) {
 function dragDrop(e) {
     if (e.stopPropagation) e.stopPropagation();
     if (dragSrcEl !== this) {
-        // Intercambiar en el array de datos
         const srcIdx = parseInt(dragSrcEl.dataset.index);
         const targetIdx = parseInt(this.dataset.index);
         
@@ -259,7 +402,7 @@ function openClassDetail(id) {
 function renderStudents() {
     const list = document.getElementById('studentsList'); list.innerHTML = '';
     const classStudents = appData.students.filter(s => s.classId == currentClassId);
-    if(classStudents.length === 0) { list.innerHTML = '<p style="grid-column:1/-1; text-align:center;">No hay alumnos.</p>'; return; }
+    if(classStudents.length === 0) { list.innerHTML = `<p style="grid-column:1/-1; text-align:center;">${t('txt_empty')}</p>`; return; }
     classStudents.forEach(s => {
         list.innerHTML += `<div class="student-card" id="card-${s.id}" onclick="toggleSelect(${s.id})"><input type="checkbox" class="stu-check" value="${s.id}"><b>${s.name}</b><span class="points-badge">${s.points} pts</span></div>`;
     });
@@ -280,7 +423,7 @@ function toggleSelectAll() {
 }
 function applyPoints(amount) {
     const checks = document.querySelectorAll('.stu-check:checked');
-    if(!checks.length) return alert("Selecciona alumnos.");
+    if(!checks.length) return alert(t('txt_select_stu'));
     const reason = document.getElementById('pointReason').value;
     checks.forEach(c => {
         const s = appData.students.find(stu => stu.id == c.value);
@@ -299,7 +442,7 @@ function addToHistory(studentId, classId, type, amount, reason) {
 function renderClassHistory() {
     const container = document.getElementById('classHistoryList');
     const logs = appData.history.filter(h => h.classId == currentClassId).sort((a,b) => b.id - a.id).slice(0, 50);
-    let html = `<div class="hist-row header"><div>Estudiante</div><div>Fecha</div><div>Razón</div><div>Pts</div></div>`;
+    let html = `<div class="hist-row header"><div>${t('txt_student')}</div><div>${t('txt_date')}</div><div>${t('txt_reason')}</div><div>${t('txt_pts')}</div></div>`;
     logs.forEach(log => {
         const s = appData.students.find(stu => stu.id == log.studentId);
         if(s) html += `<div class="hist-row"><strong>${s.name}</strong><span style="font-size:0.8rem;color:#666">${log.date}</span><span>${log.reason}</span><span class="hist-badge ${log.amount > 0 ? 'h-earn' : 'h-spend'}">${log.amount>0?'+':''}${log.amount}</span></div>`;
@@ -308,33 +451,33 @@ function renderClassHistory() {
 }
 function renderClassPlanning() {
     const list = document.getElementById('classWeeklyPlanList');
-    const tasks = appData.tasks.filter(t => t.classId == currentClassId && isDateInCurrentWeek(t.date)).sort((a,b) => new Date(a.date) - new Date(b.date));
-    list.innerHTML = tasks.length ? '' : '<p style="text-align:center;">Nada esta semana.</p>';
-    tasks.forEach(t => {
-        list.innerHTML += `<div class="task-item"><div><b>${t.title}</b> <span class="tag-badge tag-${t.tag}">${t.tag}</span><br><small>${t.description || ''}</small></div><div>${new Date(t.date).toLocaleDateString()}</div></div>`;
+    const tasks = appData.tasks.filter(tk => tk.classId == currentClassId && isDateInCurrentWeek(tk.date)).sort((a,b) => new Date(a.date) - new Date(b.date));
+    list.innerHTML = tasks.length ? '' : `<p style="text-align:center;">${t('txt_nothing_week')}</p>`;
+    tasks.forEach(tk => {
+        list.innerHTML += `<div class="task-item"><div><b>${tk.title}</b> <span class="tag-badge tag-${tk.tag}">${tk.tag}</span><br><small>${tk.description || ''}</small></div><div>${new Date(tk.date).toLocaleDateString()}</div></div>`;
     });
 }
 function renderGradesViewOnly() {
     const table = document.getElementById('gradesTableView');
-    const tasks = appData.tasks.filter(t => t.classId == currentClassId).sort((a,b)=>new Date(a.date)-new Date(b.date));
+    const tasks = appData.tasks.filter(tk => tk.classId == currentClassId).sort((a,b)=>new Date(a.date)-new Date(b.date));
     const studs = appData.students.filter(s => s.classId == currentClassId);
-    let html = `<thead><tr><th>Alumno</th>${tasks.map(t=>`<th>${t.title}</th>`).join('')}</tr></thead><tbody>`;
+    let html = `<thead><tr><th>${t('txt_student')}</th>${tasks.map(tk=>`<th>${tk.title}</th>`).join('')}</tr></thead><tbody>`;
     studs.forEach(s => {
-        html += `<tr><td>${s.name}</td>${tasks.map(t => `<td>${(s.grades && s.grades[t.id]) ? s.grades[t.id] : '-'}</td>`).join('')}</tr>`;
+        html += `<tr><td>${s.name}</td>${tasks.map(tk => `<td>${(s.grades && s.grades[tk.id]) ? s.grades[tk.id] : '-'}</td>`).join('')}</tr>`;
     });
     table.innerHTML = html + '</tbody>';
 }
 function openRedeemModal() {
-    if(!document.querySelectorAll('.stu-check:checked').length) return alert("Selecciona alumnos.");
+    if(!document.querySelectorAll('.stu-check:checked').length) return alert(t('txt_select_stu'));
     const grid = document.getElementById('redeemGrid'); 
-    grid.innerHTML = appData.rewards.length ? '' : '<p>No hay premios.</p>';
+    grid.innerHTML = appData.rewards.length ? '' : `<p>${t('txt_nothing_here')}</p>`;
     appData.rewards.forEach(r => {
         grid.innerHTML += `<div class="redeem-item" onclick="processRedeem(${r.cost}, '${r.name}')"><b>${r.name}</b><br>${r.cost} pts</div>`;
     });
     document.getElementById('modalRedeem').style.display = 'flex';
 }
 function processRedeem(cost, name) {
-    if(confirm(`¿Canjear "${name}"?`)) {
+    if(confirm(`${t('txt_confirm_redeem')} "${name}"?`)) {
         document.querySelectorAll('.stu-check:checked').forEach(c => {
             const s = appData.students.find(stu => stu.id == c.value);
             if(s) { s.points -= cost; addToHistory(s.id, s.classId, 'REDEEM', -cost, `Canje: ${name}`); }
@@ -350,29 +493,28 @@ function initNotebook() {
     const selects = ['taskClass', 'anecClass', 'gradebookClassSelect', 'adminStudentClass'];
     selects.forEach(id => {
         const el = document.getElementById(id);
-        if(el) { el.innerHTML = '<option value="">Clase...</option>'; appData.classes.forEach(c => el.innerHTML += `<option value="${c.id}">${c.name}</option>`); }
+        if(el) { el.innerHTML = `<option value="">${t('txt_class')}</option>`; appData.classes.forEach(c => el.innerHTML += `<option value="${c.id}">${c.name}</option>`); }
     });
     renderTasks(); renderStudentAdminList(); renderRewards(); renderAnecdotesNotebook(); renderGlobalHistory();
 }
 function openNbTab(id) {
     document.querySelectorAll('.nb-content').forEach(c => c.classList.remove('active'));
-    document.querySelectorAll('.nb-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.nb-tab').forEach(b => b.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     event.target.classList.add('active');
 }
 
-// Historial Global (NUEVO V11)
+// Historial Global
 function renderGlobalHistory() {
     const container = document.getElementById('globalHistoryContainer');
     const search = document.getElementById('globalHistSearch').value.toLowerCase();
     
-    // Filtrar y ordenar
     const logs = appData.history.sort((a,b) => b.id - a.id).filter(log => {
         const s = appData.students.find(stu => stu.id == log.studentId);
         return !search || (s && s.name.toLowerCase().includes(search));
-    }).slice(0, 100); // Límite de 100 para no saturar
+    }).slice(0, 100);
 
-    let html = `<table class="data-table"><thead><tr><th>Fecha</th><th>Clase</th><th>Alumno</th><th>Razón</th><th>Pts</th></tr></thead><tbody>`;
+    let html = `<table class="data-table"><thead><tr><th>${t('txt_date')}</th><th>${t('txt_class')}</th><th>${t('txt_student')}</th><th>${t('txt_reason')}</th><th>${t('txt_pts')}</th></tr></thead><tbody>`;
     logs.forEach(log => {
         const s = appData.students.find(stu => stu.id == log.studentId);
         const c = appData.classes.find(cl => cl.id == log.classId);
@@ -389,7 +531,7 @@ function renderGlobalHistory() {
     container.innerHTML = html + '</tbody></table>';
 }
 
-// Planner + Descripción
+// Planner
 function addTask() {
     const id = document.getElementById('editTaskId').value; 
     const title = document.getElementById('taskTitle').value;
@@ -397,12 +539,12 @@ function addTask() {
     const date = document.getElementById('taskDate').value;
     const tag = document.getElementById('taskTag').value; 
     const period = document.getElementById('taskPeriod').value;
-    const desc = document.getElementById('taskDesc').value; // Nueva descripción
+    const desc = document.getElementById('taskDesc').value;
 
     if(title && cid && date) {
         if(id) { 
-            const t = appData.tasks.find(x => x.id == id); 
-            if(t) { t.title = title; t.classId = cid; t.date = date; t.tag = tag; t.period = period; t.description = desc; } 
+            const tk = appData.tasks.find(x => x.id == id); 
+            if(tk) { tk.title = title; tk.classId = cid; tk.date = date; tk.tag = tag; tk.period = period; tk.description = desc; } 
             cancelTaskEdit(); 
         } else { 
             appData.tasks.push({ id: Date.now(), title, classId: cid, date, tag, period, description: desc }); 
@@ -414,15 +556,15 @@ function addTask() {
 }
 function renderTasks() {
     const list = document.getElementById('tasksList'); list.innerHTML = '';
-    appData.tasks.sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(t => {
+    appData.tasks.sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(tk => {
         list.innerHTML += `
         <div class="task-item">
             <div>
-                <b>${t.title}</b> <span class="tag-badge tag-${t.tag}">${t.tag}</span>
-                <br><small style="color:#666">${t.description || ''}</small>
-                <br><small>${t.date}</small>
+                <b>${tk.title}</b> <span class="tag-badge tag-${tk.tag}">${tk.tag}</span>
+                <br><small style="color:#666">${tk.description || ''}</small>
+                <br><small>${tk.date}</small>
             </div>
-            <button class="btn-act del" onclick="delTask(${t.id})">🗑️</button>
+            <button class="btn-act del" onclick="delTask(${tk.id})">🗑️</button>
         </div>`;
     });
 }
@@ -432,18 +574,18 @@ function cancelTaskEdit() {
     document.getElementById('editTaskId').value = ''; 
     document.getElementById('btnCancelTask').style.display = 'none'; 
 }
-function delTask(id) { if(confirm("¿Borrar?")) { appData.tasks = appData.tasks.filter(t => t.id !== id); saveLocal(); renderTasks(); } }
+function delTask(id) { if(confirm(t('txt_confirm_del'))) { appData.tasks = appData.tasks.filter(tk => tk.id !== id); saveLocal(); renderTasks(); } }
 
 // Admin Alumnos & Notas
 function renderCentralGradebook() {
     const cid = document.getElementById('gradebookClassSelect').value;
     const container = document.getElementById('centralGradebookContainer');
     if(!cid) return container.innerHTML = '';
-    const tasks = appData.tasks.filter(t => t.classId == cid).sort((a,b)=>new Date(a.date)-new Date(b.date));
+    const tasks = appData.tasks.filter(tk => tk.classId == cid).sort((a,b)=>new Date(a.date)-new Date(b.date));
     const studs = appData.students.filter(s => s.classId == cid);
-    let html = `<table class="data-table"><thead><tr><th>Alumno</th>${tasks.map(t=>`<th>${t.title}</th>`).join('')}</tr></thead><tbody>`;
+    let html = `<table class="data-table"><thead><tr><th>${t('txt_student')}</th>${tasks.map(tk=>`<th>${tk.title}</th>`).join('')}</tr></thead><tbody>`;
     studs.forEach(s => {
-        html += `<tr><td><b>${s.name}</b></td>${tasks.map(t => `<td><input type="number" value="${(s.grades && s.grades[t.id]) ? s.grades[t.id] : ''}" onchange="saveGrade(${s.id}, ${t.id}, this.value)"></td>`).join('')}</tr>`;
+        html += `<tr><td><b>${s.name}</b></td>${tasks.map(tk => `<td><input type="number" value="${(s.grades && s.grades[tk.id]) ? s.grades[tk.id] : ''}" onchange="saveGrade(${s.id}, ${tk.id}, this.value)"></td>`).join('')}</tr>`;
     });
     container.innerHTML = html + `</tbody></table>`;
 }
@@ -462,7 +604,7 @@ function renderStudentAdminList() {
         if(studs.length) { container.innerHTML += `<h4>${c.name}</h4>`; studs.forEach(s => container.innerHTML += `<div class="admin-student-item">${s.name} <button class="btn-act del" onclick="delStudent(${s.id})">🗑️</button></div>`); }
     });
 }
-function delStudent(id) { if(confirm("¿Borrar alumno?")) { appData.students = appData.students.filter(s => s.id !== id); saveLocal(); renderStudentAdminList(); } }
+function delStudent(id) { if(confirm(t('txt_confirm_del'))) { appData.students = appData.students.filter(s => s.id !== id); saveLocal(); renderStudentAdminList(); } }
 
 // Bitácora y Premios
 function saveAnecdote() {
@@ -477,16 +619,16 @@ function saveAnecdote() {
 function renderAnecdotesNotebook() {
     const list = document.getElementById('notebookAnecdotesList'); list.innerHTML = '';
     appData.anecdotes.slice().reverse().forEach(a => {
-        const sName = a.studentId === 'ALL' ? '📢 TODA LA CLASE' : (appData.students.find(s=>s.id==a.studentId)?.name || '?');
+        const sName = a.studentId === 'ALL' ? t('txt_all_class') : (appData.students.find(s=>s.id==a.studentId)?.name || '?');
         list.innerHTML += `<div class="anecdote-item ${a.importance}"><div style="flex:1;"><strong>${sName}</strong>: ${a.text}</div><button class="btn-act del" onclick="delAnec(${a.id})">🗑️</button></div>`;
     });
 }
-function delAnec(id) { if(confirm("¿Borrar?")) { appData.anecdotes = appData.anecdotes.filter(a => a.id !== id); saveLocal(); renderAnecdotesNotebook(); } }
+function delAnec(id) { if(confirm(t('txt_confirm_del'))) { appData.anecdotes = appData.anecdotes.filter(a => a.id !== id); saveLocal(); renderAnecdotesNotebook(); } }
 function updateAnecStudents() {
     const cid = document.getElementById('anecClass').value;
     const sel = document.getElementById('anecStudent'); 
-    sel.innerHTML = '<option value="">Alumno...</option>'; sel.disabled = !cid;
-    if(cid) { sel.innerHTML += `<option value="ALL">📢 TODA LA CLASE</option>`; appData.students.filter(s => s.classId == cid).forEach(s => sel.innerHTML += `<option value="${s.id}">${s.name}</option>`); }
+    sel.innerHTML = `<option value="">${t('txt_student')}</option>`; sel.disabled = !cid;
+    if(cid) { sel.innerHTML += `<option value="ALL">${t('txt_all_class')}</option>`; appData.students.filter(s => s.classId == cid).forEach(s => sel.innerHTML += `<option value="${s.id}">${s.name}</option>`); }
 }
 function saveReward() {
     const name = document.getElementById('rewardName').value; const cost = document.getElementById('rewardCost').value;
@@ -497,7 +639,7 @@ function renderRewards() {
     appData.rewards.forEach(r => { list.innerHTML += `<div style="border:1px solid #ddd; padding:5px;">${r.name} (${r.cost})</div>`; });
 }
 
-// Gestión Clases (Icono + Color)
+// Gestión Clases
 function saveClass() {
     const name = document.getElementById('modalClassName').value; 
     const color = document.getElementById('selectedColor').value; 
@@ -522,7 +664,7 @@ function editCurrentClass() {
         document.getElementById('modalClass').style.display = 'flex'; 
     } 
 }
-function deleteCurrentClass() { if(confirm("¿Borrar clase?")) { appData.classes = appData.classes.filter(c => c.id != currentClassId); saveLocal(); nav('classes'); } }
+function deleteCurrentClass() { if(confirm(t('txt_confirm_del'))) { appData.classes = appData.classes.filter(c => c.id != currentClassId); saveLocal(); nav('classes'); } }
 function pickColor(c) { document.getElementById('selectedColor').value = c; }
 function openClassModal() { 
     document.getElementById('modalClassName').value = ""; 
@@ -539,12 +681,12 @@ function cancelAnecEdit() { document.getElementById('anecText').value = ''; docu
 // Cloud
 async function saveToCloud() {
     const btn = document.querySelector('.btn-cloud-save'); btn.innerText = '⏳';
-    try { await fetch(CLOUD_URL, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(appData) }); alert('✅ Guardado.'); } 
-    catch(e) { alert('❌ Error.'); } btn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Subir a Nube';
+    try { await fetch(CLOUD_URL, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(appData) }); alert(t('txt_saved')); } 
+    catch(e) { alert(t('txt_error')); } btn.innerHTML = `<i class="fas fa-cloud-upload-alt"></i> ${t('btn_upload')}`;
 }
 async function loadFromCloud() {
-    if(!confirm("Sobrescribir datos?")) return;
+    if(!confirm("Overwrite local data?")) return;
     const btn = document.querySelector('.btn-cloud-load'); btn.innerText = '⏳';
     try { const res = await fetch(CLOUD_URL + '?t=' + Date.now()); const json = await res.json(); appData = json[BUCKET_NAME] || json; saveLocal(); location.reload(); } 
-    catch(e) { alert('❌ Error.'); } btn.innerHTML = '<i class="fas fa-cloud-download-alt"></i> Bajar de Nube';
+    catch(e) { alert(t('txt_error')); } btn.innerHTML = `<i class="fas fa-cloud-download-alt"></i> ${t('btn_download')}`;
 }

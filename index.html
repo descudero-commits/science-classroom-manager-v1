@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Science Teacher Manager v11</title>
+    <title>Science Teacher Manager v12</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
@@ -17,7 +17,7 @@
             <div class="avatar-circle" id="sidebarAvatar">👨‍🔬</div>
             <div class="profile-info">
                 <h3 id="sidebarName">Profesor</h3>
-                <small>⚙️ Configuración</small>
+                <small data-translate="sidebar_config">⚙️ Configuración</small>
             </div>
         </div>
         
@@ -25,18 +25,24 @@
 
         <nav class="nav-menu">
             <button onclick="nav('dashboard')" id="nav-dashboard" class="active">
-                <i class="fas fa-atom"></i> Dashboard
+                <i class="fas fa-atom"></i> <span data-translate="nav_dash">Dashboard</span>
             </button>
             <button onclick="nav('classes')" id="nav-classes">
-                <i class="fas fa-flask"></i> Mis Clases
+                <i class="fas fa-flask"></i> <span data-translate="nav_classes">Mis Clases</span>
             </button>
             <button onclick="nav('notebook')" id="nav-notebook">
-                <i class="fas fa-book-open"></i> Notebook & Admin
+                <i class="fas fa-book-open"></i> <span data-translate="nav_notebook">Notebook & Admin</span>
             </button>
         </nav>
 
+        <div class="separator"></div>
+        
+        <button onclick="toggleLanguage()" class="btn-lang">
+            <i class="fas fa-globe"></i> <span id="currentLangDisplay">Español</span>
+        </button>
+
         <div class="sidebar-footer">
-            <small>ScienceManager v11.0</small>
+            <small>ScienceManager v12.0 (Intl)</small>
         </div>
     </aside>
 
@@ -44,39 +50,39 @@
         
         <section id="view-dashboard" class="view active">
             <header>
-                <h1>Panel de Control</h1>
+                <h1 data-translate="dash_title">Panel de Control</h1>
                 <span class="date-badge" id="currentDate"></span>
             </header>
 
             <div class="widgets-row">
                 <div class="widget warning-widget">
-                    <h3><i class="fas fa-radiation-alt"></i> Alertas</h3>
+                    <h3><i class="fas fa-radiation-alt"></i> <span data-translate="dash_alerts">Alertas</span></h3>
                     <div id="dash-alerts" class="widget-list"></div>
                 </div>
                 <div class="widget">
-                    <h3><i class="fas fa-calendar-day"></i> Agenda Semanal</h3>
+                    <h3><i class="fas fa-calendar-day"></i> <span data-translate="dash_weekly">Agenda Semanal</span></h3>
                     <div id="dash-weekly-plan" class="widget-list"></div>
                 </div>
             </div>
 
             <div class="schedule-section">
-                <h3>📅 Horario Semanal</h3>
+                <h3>📅 <span data-translate="dash_schedule">Horario Semanal</span></h3>
                 <div class="weekly-grid">
-                    <div class="day-col"><h4>Lunes</h4><div id="sch-mon" class="day-content"></div><button onclick="openScheduleModal('mon')">+</button></div>
-                    <div class="day-col"><h4>Martes</h4><div id="sch-tue" class="day-content"></div><button onclick="openScheduleModal('tue')">+</button></div>
-                    <div class="day-col"><h4>Miércoles</h4><div id="sch-wed" class="day-content"></div><button onclick="openScheduleModal('wed')">+</button></div>
-                    <div class="day-col"><h4>Jueves</h4><div id="sch-thu" class="day-content"></div><button onclick="openScheduleModal('thu')">+</button></div>
-                    <div class="day-col"><h4>Viernes</h4><div id="sch-fri" class="day-content"></div><button onclick="openScheduleModal('fri')">+</button></div>
+                    <div class="day-col"><h4 data-translate="day_mon">Lunes</h4><div id="sch-mon" class="day-content"></div><button onclick="openScheduleModal('mon')">+</button></div>
+                    <div class="day-col"><h4 data-translate="day_tue">Martes</h4><div id="sch-tue" class="day-content"></div><button onclick="openScheduleModal('tue')">+</button></div>
+                    <div class="day-col"><h4 data-translate="day_wed">Miércoles</h4><div id="sch-wed" class="day-content"></div><button onclick="openScheduleModal('wed')">+</button></div>
+                    <div class="day-col"><h4 data-translate="day_thu">Jueves</h4><div id="sch-thu" class="day-content"></div><button onclick="openScheduleModal('thu')">+</button></div>
+                    <div class="day-col"><h4 data-translate="day_fri">Viernes</h4><div id="sch-fri" class="day-content"></div><button onclick="openScheduleModal('fri')">+</button></div>
                 </div>
             </div>
         </section>
 
         <section id="view-classes" class="view">
             <header>
-                <h1>Laboratorio de Clases</h1>
-                <button onclick="openClassModal()" class="btn-primary">+ Nueva Clase</button>
+                <h1 data-translate="classes_title">Laboratorio de Clases</h1>
+                <button onclick="openClassModal()" class="btn-primary" data-translate="btn_new_class">+ Nueva Clase</button>
             </header>
-            <div class="drag-hint"><small>💡 Arrastra las tarjetas para reordenarlas</small></div>
+            <div class="drag-hint"><small data-translate="drag_hint">💡 Arrastra las tarjetas para reordenarlas</small></div>
             <div id="classesGrid" class="grid-cards"></div>
         </section>
 
@@ -91,10 +97,10 @@
             </header>
 
             <div class="tabs">
-                <button class="tab-btn active" onclick="openClassTab('tab-mgmt')">🎮 Puntos</button>
-                <button class="tab-btn" onclick="openClassTab('tab-planning')">📅 Planificación</button>
-                <button class="tab-btn" onclick="openClassTab('tab-grades-view')">📊 Notas</button>
-                <button class="tab-btn" onclick="openClassTab('tab-history')">📜 Historial Clase</button>
+                <button class="tab-btn active" onclick="openClassTab('tab-mgmt')" data-translate="tab_points">🎮 Puntos</button>
+                <button class="tab-btn" onclick="openClassTab('tab-planning')" data-translate="tab_planning">📅 Planificación</button>
+                <button class="tab-btn" onclick="openClassTab('tab-grades-view')" data-translate="tab_grades">📊 Notas</button>
+                <button class="tab-btn" onclick="openClassTab('tab-history')" data-translate="tab_history">📜 Historial</button>
             </div>
 
             <div id="tab-mgmt" class="class-tab-content active">
@@ -102,14 +108,14 @@
                     <div class="bulk-left">
                         <div class="bulk-group">
                             <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
-                            <label for="selectAll">Todos</label>
+                            <label for="selectAll" data-translate="lbl_all">Todos</label>
                         </div>
                         <select id="pointReason" class="reason-select">
-                            <option value="Participación">Participación</option>
-                            <option value="Tarea">Tarea Completa</option>
-                            <option value="Conducta">Conducta</option>
-                            <option value="Laboratorio">Buen Laboratorio</option>
-                            <option value="Material">Material</option>
+                            <option value="Participación" data-translate="reason_part">Participación</option>
+                            <option value="Tarea" data-translate="reason_hw">Tarea Completa</option>
+                            <option value="Conducta" data-translate="reason_beh">Conducta</option>
+                            <option value="Laboratorio" data-translate="reason_lab">Buen Laboratorio</option>
+                            <option value="Material" data-translate="reason_mat">Material</option>
                         </select>
                     </div>
                     <div class="bulk-actions">
@@ -120,7 +126,7 @@
                             <input type="number" id="customPointsInput" placeholder="#">
                             <button onclick="applyCustomPoints()" class="btn-icon-small info">OK</button>
                         </div>
-                        <button onclick="openRedeemModal()" class="btn-redeem">🎁 Canjear</button>
+                        <button onclick="openRedeemModal()" class="btn-redeem" data-translate="btn_redeem">🎁 Canjear</button>
                     </div>
                 </div>
                 <div id="studentsList" class="students-grid"></div>
@@ -128,13 +134,13 @@
 
             <div id="tab-planning" class="class-tab-content">
                 <div class="card">
-                    <h3>Plan para esta Semana</h3>
+                    <h3 data-translate="plan_week_title">Plan para esta Semana</h3>
                     <div id="classWeeklyPlanList" class="list-vertical"></div>
                 </div>
             </div>
 
             <div id="tab-grades-view" class="class-tab-content">
-                <div class="info-banner">✏️ Para editar notas, ve al <b>Notebook > Gradebook</b>.</div>
+                <div class="info-banner" data-translate="grades_hint">✏️ Para editar notas, ve al <b>Notebook > Gradebook</b>.</div>
                 <div class="table-container">
                     <table class="data-table" id="gradesTableView"></table>
                 </div>
@@ -146,38 +152,38 @@
         </section>
 
         <section id="view-notebook" class="view">
-            <header><h1>Notebook del Docente</h1></header>
+            <header><h1 data-translate="nb_title">Notebook del Docente</h1></header>
             
             <div class="notebook-tabs">
-                <button class="nb-tab active" onclick="openNbTab('nb-planner')">📅 Planner</button>
-                <button class="nb-tab" onclick="openNbTab('nb-global-history')">📜 Historial Global</button>
-                <button class="nb-tab" onclick="openNbTab('nb-gradebook')">📝 Gradebook</button>
-                <button class="nb-tab" onclick="openNbTab('nb-students')">👥 Admin Alumnos</button>
-                <button class="nb-tab" onclick="openNbTab('nb-shop')">🛍️ Tienda</button>
-                <button class="nb-tab" onclick="openNbTab('nb-anecdotes')">📖 Bitácora</button>
+                <button class="nb-tab active" onclick="openNbTab('nb-planner')" data-translate="nb_tab_planner">📅 Planner</button>
+                <button class="nb-tab" onclick="openNbTab('nb-global-history')" data-translate="nb_tab_hist">📜 Historial Global</button>
+                <button class="nb-tab" onclick="openNbTab('nb-gradebook')" data-translate="nb_tab_grade">📝 Gradebook</button>
+                <button class="nb-tab" onclick="openNbTab('nb-students')" data-translate="nb_tab_admin">👥 Admin Alumnos</button>
+                <button class="nb-tab" onclick="openNbTab('nb-shop')" data-translate="nb_tab_shop">🛍️ Tienda</button>
+                <button class="nb-tab" onclick="openNbTab('nb-anecdotes')" data-translate="nb_tab_log">📖 Bitácora</button>
             </div>
 
             <div id="nb-planner" class="nb-content active">
                 <div class="card planner-form">
-                    <h3>Nueva Actividad / Lección</h3>
+                    <h3 data-translate="planner_new">Nueva Actividad / Lección</h3>
                     <div class="form-grid">
-                        <input type="text" id="taskTitle" placeholder="Título (ej. Reacción Redox)" class="span-2">
+                        <input type="text" id="taskTitle" placeholder="Título (ej. Reacción Redox)" class="span-2" data-translate="ph_task_title">
                         <select id="taskClass"></select>
                         <input type="date" id="taskDate">
                         <select id="taskTag">
-                            <option value="Lección">📖 Lección</option>
-                            <option value="Test">📝 Test</option>
-                            <option value="Tarea">🏠 Tarea</option>
-                            <option value="Proyecto">🧪 Proyecto</option>
-                            <option value="Quiz">⚡ Quiz</option>
+                            <option value="Lección" data-translate="tag_lesson">📖 Lección</option>
+                            <option value="Test" data-translate="tag_test">📝 Test</option>
+                            <option value="Tarea" data-translate="tag_hw">🏠 Tarea</option>
+                            <option value="Proyecto" data-translate="tag_proj">🧪 Proyecto</option>
+                            <option value="Quiz" data-translate="tag_quiz">⚡ Quiz</option>
                         </select>
-                        <input type="text" id="taskPeriod" placeholder="Periodo (ej. Trim 1)">
-                        <textarea id="taskDesc" class="span-2" placeholder="Descripción (ej. Pág 45-50, traer bata de lab...)" style="height:60px;"></textarea>
+                        <input type="text" id="taskPeriod" placeholder="Periodo (ej. Trim 1)" data-translate="ph_period">
+                        <textarea id="taskDesc" class="span-2" placeholder="Descripción..." style="height:60px;" data-translate="ph_desc"></textarea>
                     </div>
                     <input type="hidden" id="editTaskId">
                     <div class="form-actions">
-                        <button onclick="addTask()" id="btnSaveTask" class="btn-primary full-width">Guardar Plan</button>
-                        <button onclick="cancelTaskEdit()" id="btnCancelTask" class="btn-secondary full-width" style="display:none; margin-top:5px;">Cancelar</button>
+                        <button onclick="addTask()" id="btnSaveTask" class="btn-primary full-width" data-translate="btn_save_plan">Guardar Plan</button>
+                        <button onclick="cancelTaskEdit()" id="btnCancelTask" class="btn-secondary full-width" style="display:none; margin-top:5px;" data-translate="btn_cancel">Cancelar</button>
                     </div>
                 </div>
                 <div id="tasksList" class="list-vertical"></div>
@@ -185,14 +191,14 @@
 
             <div id="nb-global-history" class="nb-content">
                 <div class="filter-bar">
-                    <input type="text" id="globalHistSearch" placeholder="Buscar alumno..." onkeyup="renderGlobalHistory()">
+                    <input type="text" id="globalHistSearch" placeholder="Buscar alumno..." onkeyup="renderGlobalHistory()" data-translate="ph_search_stu">
                 </div>
                 <div class="table-container" id="globalHistoryContainer"></div>
             </div>
 
             <div id="nb-gradebook" class="nb-content">
                 <div class="filter-bar">
-                    <label>Selecciona Clase:</label>
+                    <label data-translate="lbl_sel_class">Selecciona Clase:</label>
                     <select id="gradebookClassSelect" onchange="renderCentralGradebook()">
                         <option value="">-- Seleccionar --</option>
                     </select>
@@ -203,21 +209,21 @@
             <div id="nb-students" class="nb-content">
                 <div class="card form-row">
                     <select id="adminStudentClass"><option value="">Clase...</option></select>
-                    <input type="text" id="adminStudentName" placeholder="Nombre Alumno">
+                    <input type="text" id="adminStudentName" placeholder="Nombre Alumno" data-translate="ph_stu_name">
                     <input type="hidden" id="editStudentId">
-                    <button onclick="saveStudentAdmin()" id="btnSaveStudent" class="btn-primary">Añadir</button>
-                    <button onclick="cancelStudentEdit()" id="btnCancelStudent" class="btn-secondary" style="display:none;">Cancelar</button>
+                    <button onclick="saveStudentAdmin()" id="btnSaveStudent" class="btn-primary" data-translate="btn_add">Añadir</button>
+                    <button onclick="cancelStudentEdit()" id="btnCancelStudent" class="btn-secondary" style="display:none;" data-translate="btn_cancel">Cancelar</button>
                 </div>
                 <div id="adminStudentsList" class="list-vertical"></div>
             </div>
 
             <div id="nb-shop" class="nb-content">
                 <div class="card form-row">
-                    <input type="text" id="rewardName" placeholder="Premio">
+                    <input type="text" id="rewardName" placeholder="Premio" data-translate="ph_reward">
                     <input type="number" id="rewardCost" placeholder="Pts" style="width:80px;">
                     <input type="hidden" id="editRewardId">
-                    <button onclick="saveReward()" id="btnSaveReward" class="btn-primary">Crear</button>
-                    <button onclick="cancelRewardEdit()" id="btnCancelReward" class="btn-secondary" style="display:none;">Cancelar</button>
+                    <button onclick="saveReward()" id="btnSaveReward" class="btn-primary" data-translate="btn_create">Crear</button>
+                    <button onclick="cancelRewardEdit()" id="btnCancelReward" class="btn-secondary" style="display:none;" data-translate="btn_cancel">Cancelar</button>
                 </div>
                 <div id="rewardsConfigList" class="grid-cards-small"></div>
             </div>
@@ -230,16 +236,16 @@
                         </select>
                         <select id="anecStudent" disabled></select>
                         <select id="anecImportance">
-                            <option value="low">🟢 Baja (Info)</option>
-                            <option value="medium">🟠 Media (Aviso)</option>
-                            <option value="high">🔴 Alta (Crítico)</option>
+                            <option value="low" data-translate="imp_low">🟢 Baja (Info)</option>
+                            <option value="medium" data-translate="imp_med">🟠 Media (Aviso)</option>
+                            <option value="high" data-translate="imp_high">🔴 Alta (Crítico)</option>
                         </select>
                     </div>
-                    <textarea id="anecText" placeholder="Detalle del incidente..."></textarea>
+                    <textarea id="anecText" placeholder="Detalle del incidente..." data-translate="ph_incident"></textarea>
                     <input type="hidden" id="editAnecId">
                     <div class="form-actions">
-                        <button onclick="saveAnecdote()" id="btnSaveAnec" class="btn-primary full-width" style="margin-top:10px;">Registrar</button>
-                        <button onclick="cancelAnecEdit()" id="btnCancelAnec" class="btn-secondary full-width" style="margin-top:5px; display:none;">Cancelar Edición</button>
+                        <button onclick="saveAnecdote()" id="btnSaveAnec" class="btn-primary full-width" style="margin-top:10px;" data-translate="btn_register">Registrar</button>
+                        <button onclick="cancelAnecEdit()" id="btnCancelAnec" class="btn-secondary full-width" style="margin-top:5px; display:none;" data-translate="btn_cancel">Cancelar Edición</button>
                     </div>
                 </div>
                 <div id="notebookAnecdotesList" class="history-list"></div>
@@ -251,25 +257,25 @@
 
 <div id="modalProfile" class="modal-overlay">
     <div class="modal-content profile-modal-content">
-        <h3>Configuración Global</h3>
+        <h3 data-translate="modal_config_title">Configuración Global</h3>
         <div class="config-section">
-            <h4>👤 Mi Perfil</h4>
+            <h4 data-translate="sec_profile">👤 Mi Perfil</h4>
             <div style="display:flex; gap:10px;">
                 <input type="text" id="profAvatar" placeholder="Emoji" style="width:60px; text-align:center;">
-                <input type="text" id="profName" placeholder="Tu Nombre">
+                <input type="text" id="profName" placeholder="Tu Nombre" data-translate="ph_your_name">
             </div>
-            <button onclick="saveProfileSettings()" class="btn-primary full-width">Actualizar Perfil</button>
+            <button onclick="saveProfileSettings()" class="btn-primary full-width" data-translate="btn_update_prof">Actualizar Perfil</button>
         </div>
         <div class="config-section">
-            <h4>📂 Datos y Nube</h4>
+            <h4 data-translate="sec_data">📂 Datos y Nube</h4>
             <div class="action-grid">
-                <button onclick="exportToExcel()" class="btn-excel"><i class="fas fa-file-excel"></i> Descargar Excel</button>
-                <button onclick="saveToCloud()" class="btn-cloud-save"><i class="fas fa-cloud-upload-alt"></i> Subir a Nube</button>
-                <button onclick="loadFromCloud()" class="btn-cloud-load"><i class="fas fa-cloud-download-alt"></i> Bajar de Nube</button>
+                <button onclick="exportToExcel()" class="btn-excel"><i class="fas fa-file-excel"></i> <span data-translate="btn_excel">Descargar Excel</span></button>
+                <button onclick="saveToCloud()" class="btn-cloud-save"><i class="fas fa-cloud-upload-alt"></i> <span data-translate="btn_upload">Subir a Nube</span></button>
+                <button onclick="loadFromCloud()" class="btn-cloud-load"><i class="fas fa-cloud-download-alt"></i> <span data-translate="btn_download">Bajar de Nube</span></button>
             </div>
         </div>
         <div class="config-section">
-            <h4>🎨 Tema</h4>
+            <h4 data-translate="sec_theme">🎨 Tema</h4>
             <div class="theme-buttons">
                 <button onclick="setTheme('#3b82f6')" style="background:#3b82f6;"></button>
                 <button onclick="setTheme('#8b5cf6')" style="background:#8b5cf6;"></button>
@@ -278,19 +284,19 @@
                 <button onclick="setTheme('#ec4899')" style="background:#ec4899;"></button>
             </div>
         </div>
-        <button onclick="closeModal('modalProfile')" class="btn-secondary full-width">Cerrar</button>
+        <button onclick="closeModal('modalProfile')" class="btn-secondary full-width" data-translate="btn_close">Cerrar</button>
     </div>
 </div>
 
 <div id="modalClass" class="modal-overlay">
     <div class="modal-content">
-        <h3 id="modalClassTitle">Nueva Clase</h3>
+        <h3 id="modalClassTitle" data-translate="modal_class_title">Nueva Clase</h3>
         <div style="display:flex; gap:10px; margin-bottom:15px;">
             <input type="text" id="modalClassIcon" placeholder="⚛️" style="width:60px; text-align:center;">
-            <input type="text" id="modalClassName" placeholder="Nombre (ej. Física 1A)" style="flex:1; margin-bottom:0;">
+            <input type="text" id="modalClassName" placeholder="Nombre (ej. Física 1A)" style="flex:1; margin-bottom:0;" data-translate="ph_class_name">
         </div>
-        <div style="font-size:0.8rem; color:#666; margin-bottom:10px;">Iconos sugeridos: ⚛️ 🧪 🧬 🔭 🔬 🔌 🧲 🪐 🦠</div>
-        <label>Color:</label>
+        <div style="font-size:0.8rem; color:#666; margin-bottom:10px;" data-translate="icon_hint">Iconos sugeridos: ⚛️ 🧪 🧬 🔭 🔬 🔌 🧲 🪐 🦠</div>
+        <label data-translate="lbl_color">Color:</label>
         <div class="color-picker" id="classColorPicker">
             <div class="cp-option" style="background:#3b82f6;" onclick="pickColor('#3b82f6')"></div>
             <div class="cp-option" style="background:#ef4444;" onclick="pickColor('#ef4444')"></div>
@@ -301,29 +307,29 @@
         </div>
         <input type="hidden" id="selectedColor" value="#3b82f6">
         <input type="hidden" id="editClassId">
-        <button onclick="saveClass()" class="btn-primary">Guardar</button>
-        <button onclick="closeModal('modalClass')" class="btn-secondary">Cancelar</button>
+        <button onclick="saveClass()" class="btn-primary" data-translate="btn_save">Guardar</button>
+        <button onclick="closeModal('modalClass')" class="btn-secondary" data-translate="btn_cancel">Cancelar</button>
     </div>
 </div>
 
 <div id="modalSchedule" class="modal-overlay">
     <div class="modal-content">
-        <h3>Añadir al Horario</h3>
+        <h3 data-translate="modal_sched_title">Añadir al Horario</h3>
         <select id="schedClassSelect" style="margin-bottom:15px;"></select>
         <div style="display:flex; gap:10px; align-items:center; margin-bottom:15px;">
-            <div style="flex:1"><label style="font-size:0.8rem">Inicio</label><input type="time" id="schedTimeStart" style="width:100%"></div>
-            <div style="flex:1"><label style="font-size:0.8rem">Fin</label><input type="time" id="schedTimeEnd" style="width:100%"></div>
+            <div style="flex:1"><label style="font-size:0.8rem" data-translate="lbl_start">Inicio</label><input type="time" id="schedTimeStart" style="width:100%"></div>
+            <div style="flex:1"><label style="font-size:0.8rem" data-translate="lbl_end">Fin</label><input type="time" id="schedTimeEnd" style="width:100%"></div>
         </div>
-        <button onclick="saveScheduleItem()" class="btn-primary">Guardar Bloque</button>
-        <button onclick="closeModal('modalSchedule')" class="btn-secondary">Cancelar</button>
+        <button onclick="saveScheduleItem()" class="btn-primary" data-translate="btn_save_block">Guardar Bloque</button>
+        <button onclick="closeModal('modalSchedule')" class="btn-secondary" data-translate="btn_cancel">Cancelar</button>
     </div>
 </div>
 
 <div id="modalRedeem" class="modal-overlay">
     <div class="modal-content">
-        <h3>🎁 Canjear Premio</h3>
+        <h3 data-translate="modal_redeem_title">🎁 Canjear Premio</h3>
         <div id="redeemGrid" class="redeem-grid"></div>
-        <button onclick="closeModal('modalRedeem')" class="btn-secondary full-width">Cancelar</button>
+        <button onclick="closeModal('modalRedeem')" class="btn-secondary full-width" data-translate="btn_cancel">Cancelar</button>
     </div>
 </div>
 
