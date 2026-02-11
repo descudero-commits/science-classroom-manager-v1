@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teacher Manager v12.0</title>
+    <title>Teacher Manager v13 Pro</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -13,20 +13,26 @@
 <div class="app-container">
     
     <aside class="sidebar">
-        <div class="profile-widget" onclick="openProfileModal()">
-            <div class="avatar-circle">👨‍🏫</div>
-            <div class="profile-info">
-                <h3 id="sidebarName">Docente</h3>
-                <small data-translate="sidebarConfig">⚙️ Configuración</small>
+        <div class="brand">
+            <i class="fas fa-layer-group"></i> TeacherOS
+        </div>
+        
+        <div class="profile-widget" onclick="openConfigModal()">
+            <div class="avatar">Pro</div>
+            <div class="info">
+                <h4 id="sidebarName">Docente</h4>
+                <small>Configuración & Nube</small>
             </div>
         </div>
         
         <nav class="nav-menu">
-            <button onclick="nav('dashboard')" id="nav-dashboard" class="active"><i class="fas fa-home"></i> <span data-translate="navDash">Dashboard</span></button>
-            <button onclick="nav('classes')" id="nav-classes"><i class="fas fa-chalkboard-teacher"></i> <span data-translate="navClasses">Mis Clases</span></button>
-            <button onclick="nav('notebook')" id="nav-notebook"><i class="fas fa-book"></i> <span data-translate="navNotebook">Notebook Global</span></button>
+            <button onclick="nav('dashboard')" id="nav-dashboard" class="active"><i class="fas fa-chart-pie"></i> Dashboard</button>
+            <button onclick="nav('notebook')" id="nav-notebook" class="highlight-btn"><i class="fas fa-book-open"></i> Notebook (Admin)</button>
+            <div class="nav-divider">MIS CLASES</div>
+            <div id="sidebar-classes-list"></div>
+            <button onclick="openCreateClassModal()" class="add-class-btn"><i class="fas fa-plus"></i> Nueva Clase</button>
         </nav>
-
+        
         <div class="sidebar-footer">
             <small id="syncStatus">☁️ Offline</small>
         </div>
@@ -35,239 +41,141 @@
     <main class="main-content">
         
         <section id="view-dashboard" class="view active">
-            <header><h1 data-translate="dashTitle">Panel de Control</h1></header>
-            
-            <div class="widgets-row">
-                <div class="widget warning-widget">
-                    <h3 data-translate="dashAlerts">⚠️ Alertas Críticas</h3>
-                    <div id="dash-alerts" class="widget-list"></div>
-                </div>
-                <div class="widget">
-                    <h3 data-translate="dashAgenda">📅 Agenda Semanal</h3>
-                    <div id="dash-weekly-plan" class="widget-list"></div>
-                </div>
-            </div>
-
-            <div class="schedule-section">
-                <h3 data-translate="dashSchedule">Horario de Clases</h3>
-                <div class="weekly-grid">
-                    <div class="day-col"><h4 data-translate="mon">Lunes</h4><div id="sch-mon" class="day-content"></div><button onclick="openScheduleModal('mon')">+</button></div>
-                    <div class="day-col"><h4 data-translate="tue">Martes</h4><div id="sch-tue" class="day-content"></div><button onclick="openScheduleModal('tue')">+</button></div>
-                    <div class="day-col"><h4 data-translate="wed">Miércoles</h4><div id="sch-wed" class="day-content"></div><button onclick="openScheduleModal('wed')">+</button></div>
-                    <div class="day-col"><h4 data-translate="thu">Jueves</h4><div id="sch-thu" class="day-content"></div><button onclick="openScheduleModal('thu')">+</button></div>
-                    <div class="day-col"><h4 data-translate="fri">Viernes</h4><div id="sch-fri" class="day-content"></div><button onclick="openScheduleModal('fri')">+</button></div>
-                </div>
-            </div>
-        </section>
-
-        <section id="view-classes" class="view">
             <header>
-                <h1 data-translate="navClasses">Mis Clases</h1>
-                <button onclick="openClassModal()" class="btn-primary" data-translate="btnNewClass">+ Nueva Clase</button>
+                <h1>Resumen Semanal</h1>
+                <p>Tu cronograma y alertas</p>
             </header>
-            <div id="classesGrid" class="grid-cards"></div>
-        </section>
-
-        <section id="view-class-detail" class="view">
-            <header class="detail-header">
-                <button onclick="nav('classes')" class="btn-back"><i class="fas fa-arrow-left"></i> <span data-translate="btnBack">Volver</span></button>
-                <h1 id="detailTitle">Clase</h1>
-                <div class="header-actions">
-                    <button onclick="editCurrentClass()" class="btn-icon-small edit"><i class="fas fa-pen"></i></button>
-                    <button onclick="deleteCurrentClass()" class="btn-icon-small danger"><i class="fas fa-trash"></i></button>
+            
+            <div class="dashboard-grid">
+                <div class="card full-width">
+                    <div class="card-header">
+                        <h3>📅 Horario Semanal</h3>
+                        <button onclick="openScheduleModal()" class="btn-text">Editar</button>
+                    </div>
+                    <div class="schedule-grid" id="dashboardSchedule">
+                        </div>
                 </div>
-            </header>
 
-            <div class="tabs">
-                <button class="tab-btn active" onclick="openClassTab('tab-mgmt')" data-translate="tabMgmt">🎮 Gestión</button>
-                <button class="tab-btn" onclick="openClassTab('tab-planning')" data-translate="tabPlan">📅 Planificación</button>
-                <button class="tab-btn" onclick="openClassTab('tab-history')" data-translate="tabHist">📜 Historial</button>
-                <button class="tab-btn" onclick="openClassTab('tab-logbook')" data-translate="tabLog">📖 Bitácora</button>
-            </div>
-
-            <div id="tab-mgmt" class="class-tab-content active">
-                <div class="toolbar-bulk">
-                    <div class="bulk-left">
-                        <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
-                        <select id="pointReason">
-                            <option value="Participación" data-translate="optPart">Participación</option>
-                            <option value="Tarea" data-translate="optHw">Tarea</option>
-                            <option value="Conducta" data-translate="optBeh">Conducta</option>
-                            <option value="Material" data-translate="optMat">Material</option>
-                        </select>
-                    </div>
-                    <div class="bulk-right">
-                        <button onclick="applyPoints(1)" class="btn-pts success">+1</button>
-                        <button onclick="applyPoints(5)" class="btn-pts success">+5</button>
-                        <button onclick="applyPoints(-1)" class="btn-pts danger">-1</button>
-                        <button onclick="openRedeemModal()" class="btn-redeem" data-translate="btnRedeem">🎁 Canjear</button>
-                    </div>
+                <div class="card">
+                    <h3>📢 Últimas Bitácoras</h3>
+                    <div id="dash-logs" class="list-scroll"></div>
                 </div>
-                <div id="studentsList" class="students-grid"></div>
-            </div>
 
-            <div id="tab-planning" class="class-tab-content">
-                <div id="classWeeklyPlanList" class="list-vertical"></div>
-            </div>
-
-            <div id="tab-history" class="class-tab-content">
-                <div id="classHistoryList" class="history-list"></div>
-            </div>
-
-            <div id="tab-logbook" class="class-tab-content">
-                <div class="card logbook-form">
-                    <h3 data-translate="logNew">📝 Nueva Entrada / Editar</h3>
-                    <div class="form-grid">
-                        <select id="localLogStudent" class="span-2">
-                            <option value="">-- --</option>
-                        </select>
-                        <select id="localLogImp">
-                            <option value="low">🟢 Info</option>
-                            <option value="medium">🟠 Aviso</option>
-                            <option value="high">🔴 Crítico</option>
-                        </select>
-                    </div>
-                    <textarea id="localLogText" placeholder="..."></textarea>
-                    <input type="hidden" id="localLogEditId">
-                    <div class="form-actions">
-                        <button onclick="saveLocalLog()" id="btnSaveLocalLog" class="btn-primary full-width" data-translate="btnSave">Guardar</button>
-                        <button onclick="cancelLocalLog()" id="btnCancelLocalLog" class="btn-secondary full-width" style="display:none; margin-top:5px;" data-translate="btnCancel">Cancelar</button>
-                    </div>
+                <div class="card">
+                    <h3>📌 Próximas Tareas</h3>
+                    <div id="dash-planner" class="list-scroll"></div>
                 </div>
-                <h3 data-translate="logHist">Historial de Clase</h3>
-                <div id="classLogbookList" class="list-vertical"></div>
             </div>
         </section>
 
         <section id="view-notebook" class="view">
-            <header><h1 data-translate="navNotebook">Notebook Global</h1></header>
-            <div class="notebook-tabs">
-                <button class="nb-tab active" onclick="openNbTab('nb-planner')" data-translate="nbPlanner">📅 Planner</button>
-                <button class="nb-tab" onclick="openNbTab('nb-anec')" data-translate="nbLog">📖 Bitácora Global</button>
-                <button class="nb-tab" onclick="openNbTab('nb-shop')" data-translate="nbShop">🛍️ Tienda</button>
+            <header>
+                <h1>Notebook Global</h1>
+                <p>Centro de mando: Estudiantes, Notas y Planificación</p>
+            </header>
+
+            <div class="tabs">
+                <button class="tab-btn active" onclick="setNbTab('nb-students')">👥 Estudiantes</button>
+                <button class="tab-btn" onclick="setNbTab('nb-gradebook')">🎓 Gradebook (Notas)</button>
+                <button class="tab-btn" onclick="setNbTab('nb-planning')">📅 Planning</button>
+                <button class="tab-btn" onclick="setNbTab('nb-logbook')">📖 Bitácora Maestra</button>
             </div>
 
-            <div id="nb-planner" class="nb-content active">
+            <div id="nb-students" class="nb-tab-content active">
+                <div class="toolbar">
+                    <select id="nbStudentClassSelect" onchange="renderNbStudents()">
+                        <option value="">Todas las clases</option>
+                    </select>
+                    <button onclick="openAddStudentModal()" class="btn-primary">+ Alumno</button>
+                </div>
+                <div id="nbStudentList" class="table-container"></div>
+            </div>
+
+            <div id="nb-gradebook" class="nb-tab-content">
+                <div class="toolbar">
+                    <select id="nbGradebookClassSelect" onchange="renderNbGradebook()"></select>
+                    <button onclick="openAddAssignmentModal()" class="btn-primary">+ Columna (Actividad)</button>
+                </div>
+                <div class="gradebook-wrapper" id="nbGradebookTable">
+                    </div>
+            </div>
+
+            <div id="nb-planning" class="nb-tab-content">
+                <div class="toolbar">
+                    <button onclick="openAddPlanModal()" class="btn-primary">+ Planificación</button>
+                </div>
+                <div id="nbPlanningList" class="cards-grid"></div>
+            </div>
+
+            <div id="nb-logbook" class="nb-tab-content">
+                <div class="toolbar">
+                    <button onclick="openLogbookModal()" class="btn-primary">+ Nueva Entrada</button>
+                </div>
+                <div id="nbLogbookList" class="timeline"></div>
+            </div>
+        </section>
+
+        <section id="view-class" class="view">
+            <header class="class-header">
+                <div>
+                    <h1 id="clsTitle">Clase</h1>
+                    <small id="clsSubtitle">Vista de Clase</small>
+                </div>
+                <div class="header-actions">
+                    <button onclick="toggleAttendance()" class="btn-secondary">🙋‍♂️ Pasar Asistencia</button>
+                </div>
+            </header>
+
+            <div class="class-dashboard-grid">
+                <div id="attendanceWidget" class="card full-width" style="display:none; background:#f0f9ff; border-color:#bae6fd;">
+                    <h3>Asistencia de Hoy</h3>
+                    <div id="attendanceList" class="attendance-grid"></div>
+                    <button onclick="saveAttendance()" class="btn-primary small" style="margin-top:10px;">Guardar</button>
+                </div>
+
                 <div class="card">
-                    <h3 data-translate="taskNew">Nueva Tarea</h3>
-                    <div class="form-grid">
-                        <input type="text" id="taskTitle" placeholder="Título">
-                        <select id="taskClass"></select>
-                        <input type="date" id="taskDate">
-                        <select id="taskTag">
-                            <option value="Tarea">Tarea</option>
-                            <option value="Examen">Examen</option>
-                            <option value="Proyecto">Proyecto</option>
-                        </select>
-                    </div>
-                    <button onclick="addTask()" class="btn-primary full-width" data-translate="btnAdd">Añadir</button>
+                    <h3>📊 Calificaciones (Vista)</h3>
+                    <div id="clsGradebookView" class="simple-table-container"></div>
                 </div>
-                <div id="tasksList" class="list-vertical"></div>
-            </div>
 
-            <div id="nb-anec" class="nb-content">
                 <div class="card">
-                    <h3 data-translate="logGlobalTitle">Registro Global</h3>
-                    <div class="form-grid">
-                        <select id="globalLogClass" onchange="updateGlobalStudents()"><option value="">Clase...</option></select>
-                        <select id="globalLogStudent" disabled></select>
-                        <select id="globalLogImp">
-                            <option value="low">🟢 Info</option>
-                            <option value="medium">🟠 Aviso</option>
-                            <option value="high">🔴 Crítico</option>
-                        </select>
-                    </div>
-                    <textarea id="globalLogText" placeholder="..."></textarea>
-                    <input type="hidden" id="globalLogEditId">
-                    <div class="form-actions" style="margin-top:10px;">
-                        <button onclick="saveGlobalLog()" id="btnSaveGlobalLog" class="btn-primary full-width" data-translate="btnSave">Guardar</button>
-                        <button onclick="cancelGlobalLog()" id="btnCancelGlobalLog" class="btn-secondary full-width" style="display:none; margin-top:5px;" data-translate="btnCancel">Cancelar</button>
-                    </div>
+                    <h3>📖 Bitácora de Clase</h3>
+                    <div id="clsLogbookView" class="timeline"></div>
                 </div>
-                <div id="globalLogList" class="list-vertical"></div>
-            </div>
-
-            <div id="nb-shop" class="nb-content">
-                <div class="card form-row">
-                    <input type="text" id="rewardName" placeholder="Premio">
-                    <input type="number" id="rewardCost" placeholder="Costo" style="width:80px;">
-                    <button onclick="addReward()" class="btn-primary" data-translate="btnCreate">Crear</button>
-                </div>
-                <div id="rewardsList" class="grid-cards-small"></div>
             </div>
         </section>
 
     </main>
 </div>
 
-<div id="modalClass" class="modal-overlay">
-    <div class="modal-content">
-        <h3 data-translate="btnNewClass">Nueva Clase</h3>
-        <input type="text" id="modalClassName" placeholder="Nombre Clase">
-        <input type="color" id="modalClassColor" value="#3b82f6" style="height:40px;">
-        <input type="hidden" id="modalEditClassId">
-        <button onclick="saveClass()" class="btn-primary full-width" data-translate="btnSave">Guardar</button>
-        <button onclick="closeModal('modalClass')" class="btn-secondary full-width" data-translate="btnCancel">Cancelar</button>
+<div id="modalConfig" class="modal">
+    <div class="modal-box">
+        <h3>Configuración</h3>
+        <label>Nombre del Docente</label>
+        <input type="text" id="cfgName">
+        
+        <hr>
+        <label>Sincronización en Nube (Pantry)</label>
+        <div class="row-btns">
+            <button onclick="cloudSync('pull')" class="btn-secondary">📥 Descargar Datos</button>
+            <button onclick="cloudSync('push')" class="btn-primary">📤 Subir Datos</button>
+        </div>
+        <small class="hint">Asegúrate de configurar el PANTRY_ID en el script.</small>
+        
+        <hr>
+        <button onclick="saveConfig()" class="btn-primary full">Guardar</button>
+        <button onclick="closeModal('modalConfig')" class="btn-flat full">Cerrar</button>
     </div>
 </div>
 
-<div id="modalProfile" class="modal-overlay">
-    <div class="modal-content" style="width: 400px;">
-        <h3 data-translate="sidebarConfig">Configuración</h3>
-        
-        <label data-translate="lblName">👤 Tu Nombre</label>
-        <input type="text" id="profName" placeholder="Nombre">
-        
-        <label data-translate="lblLang">🌍 Idioma / Language</label>
-        <div style="display:flex; gap:10px; margin-bottom:15px;">
-            <button onclick="changeLang('es')" class="btn-secondary full-width">Español 🇪🇸</button>
-            <button onclick="changeLang('en')" class="btn-secondary full-width">English 🇺🇸</button>
+<div id="modalGeneric" class="modal">
+    <div class="modal-box">
+        <h3 id="modalTitle">Título</h3>
+        <div id="modalBody"></div>
+        <div class="modal-footer">
+            <button id="modalActionBtn" class="btn-primary">Guardar</button>
+            <button onclick="closeModal('modalGeneric')" class="btn-flat">Cancelar</button>
         </div>
-
-        <label data-translate="lblTheme">🎨 Color del Tema</label>
-        <div style="display:flex; gap:10px; margin-bottom:15px;">
-            <input type="color" id="profTheme" style="height:40px; width:50px;">
-            <button onclick="resetTheme()" class="btn-secondary" style="flex:1" data-translate="btnReset">Restaurar</button>
-        </div>
-
-        <hr style="margin: 10px 0; border:0; border-top:1px solid #eee;">
-
-        <label><b>☁️ Pantry Cloud</b></label>
-        <small style="color:#666; display:block; margin-bottom:5px;" data-translate="cloudHelp">Sincroniza usando el ID del script.</small>
-        
-        <div style="display:flex; gap:5px; margin-bottom:15px;">
-            <button onclick="cloudSync('pull')" class="btn-primary full-width" style="background:var(--warning)">📥 <span data-translate="btnLoadCloud">Descargar</span></button>
-            <button onclick="cloudSync('push')" class="btn-secondary full-width">📤 <span data-translate="btnSaveCloud">Subir</span></button>
-        </div>
-
-        <hr style="margin: 10px 0; border:0; border-top:1px solid #eee;">
-
-        <label data-translate="lblReport">📊 Reportes</label>
-        <button onclick="exportExcel()" class="btn-success full-width" style="margin-bottom:15px; background:#10b981; color:white; border:none; padding:10px; border-radius:5px;">📥 <span data-translate="btnExcel">Descargar Excel</span></button>
-
-        <button onclick="saveProfile()" class="btn-primary full-width" data-translate="btnSaveConfig">Guardar Configuración</button>
-        <button onclick="closeModal('modalProfile')" class="btn-secondary full-width" style="margin-top:5px;" data-translate="btnClose">Cerrar</button>
-    </div>
-</div>
-
-<div id="modalSchedule" class="modal-overlay">
-    <div class="modal-content">
-        <h3 data-translate="schedAdd">Añadir Bloque</h3>
-        <select id="schedClassSelect"></select>
-        <div style="display:flex; gap:5px;">
-            <input type="time" id="schedStart">
-            <input type="time" id="schedEnd">
-        </div>
-        <button onclick="saveSchedule()" class="btn-primary full-width" style="margin-top:10px;" data-translate="btnSave">Guardar</button>
-        <button onclick="closeModal('modalSchedule')" class="btn-secondary full-width" data-translate="btnCancel">Cancelar</button>
-    </div>
-</div>
-
-<div id="modalRedeem" class="modal-overlay">
-    <div class="modal-content">
-        <h3 data-translate="btnRedeem">Canjear Premio</h3>
-        <div id="redeemGrid" class="redeem-grid"></div>
-        <button onclick="closeModal('modalRedeem')" class="btn-secondary full-width" data-translate="btnClose">Cerrar</button>
     </div>
 </div>
 
