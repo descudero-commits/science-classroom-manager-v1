@@ -1,7 +1,7 @@
 // ==========================================
 // 1. CONFIGURACIÓN & TRADUCCIONES
 // ==========================================
-const PANTRY_ID = "PON_TU_ID_AQUI"; 
+const PANTRY_ID = "9df76c09-c878-45e6-9df9-7b02d9cd00ef"; 
 const BUCKET_NAME = "ScienceTeacherV12";
 const CLOUD_URL = `https://getpantry.cloud/apiv1/pantry/${PANTRY_ID}/basket/${BUCKET_NAME}`;
 
