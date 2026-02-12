@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Titanium v16 Ultimate</title>
+    <title>Titanium v17 Fixed</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
@@ -14,7 +14,7 @@
     
     <aside class="sidebar">
         <div class="logo">
-            <i class="fas fa-layer-group"></i> <span>Titanium v16</span>
+            <i class="fas fa-layer-group"></i> <span>Titanium v17</span>
         </div>
 
         <div class="user-card" onclick="openConfigModal()">
@@ -36,8 +36,12 @@
 
             <p class="menu-label" data-i18n="menu_classes">MIS CLASES</p>
             <div id="sidebarClassList"></div>
-            <button onclick="openModal('modalClass')" class="add-btn"><i class="fas fa-plus"></i> <span data-i18n="btn_new_class">Nueva Clase</span></button>
+            
+            <button onclick="openModal('modalClass')" class="add-btn">
+                <i class="fas fa-plus"></i> <span data-i18n="btn_new_class">Nueva Clase</span>
+            </button>
         </nav>
+        
         <div class="status-bar"><span id="cloudStatus">☁️ Offline</span></div>
     </aside>
 
@@ -45,21 +49,36 @@
 
         <section id="view-dashboard" class="page active">
             <header class="page-header">
-                <h1 data-i18n="dashboard">Dashboard</h1>
-                <p data-i18n="dashboard_subtitle">Resumen general</p>
+                <div>
+                    <h1 data-i18n="dashboard">Dashboard</h1>
+                    <p data-i18n="dashboard_subtitle">Resumen general</p>
+                </div>
             </header>
+
             <div class="dashboard-grid">
                 <div class="card full-width">
-                    <div class="card-head"><h3 data-i18n="schedule">Horario</h3><button onclick="openScheduleEditor()" class="btn-text">Editar</button></div>
+                    <div class="card-head">
+                        <h3 data-i18n="schedule">Horario Semanal</h3>
+                        <button onclick="openScheduleEditor()" class="btn-text">Editar Horario</button>
+                    </div>
                     <div class="week-grid" id="dashSchedule"></div>
                 </div>
-                <div class="card"><h3 data-i18n="top_students">🏆 Top Estudiantes</h3><div id="dashTopStudents" class="simple-list"></div></div>
-                <div class="card"><h3 data-i18n="upcoming">📌 Eventos Próximos</h3><div id="dashPlannerList" class="simple-list"></div></div>
+
+                <div class="card">
+                    <h3 data-i18n="top_students">🏆 Top Estudiantes</h3>
+                    <div id="dashTopStudents" class="simple-list"></div>
+                </div>
+
+                <div class="card">
+                    <h3 data-i18n="upcoming">📌 Eventos Próximos</h3>
+                    <div id="dashPlannerList" class="simple-list"></div>
+                </div>
             </div>
         </section>
 
         <section id="view-notebook" class="page">
             <header class="page-header"><h1 data-i18n="notebook">Notebook Global</h1></header>
+            
             <div class="tabs-container">
                 <button class="tab active" onclick="switchNbTab('tab-nb-students')" data-i18n="tab_students">Estudiantes</button>
                 <button class="tab" onclick="switchNbTab('tab-nb-gradebook')" data-i18n="tab_gradebook">Notas</button>
@@ -80,7 +99,7 @@
                     <select id="filterGradebookClass" onchange="renderGradebook()"></select>
                     <button onclick="openModal('modalAssignment')" class="btn-primary" data-i18n="btn_add_col">+ Columna</button>
                 </div>
-                <div class="alert-box">💡 Click en el encabezado de columna para Editar/Borrar actividad.</div>
+                <div class="alert-box">💡 Click en el lápiz del encabezado para Editar Actividad.</div>
                 <div id="gradebookContainer" class="excel-container"></div>
             </div>
 
@@ -101,16 +120,35 @@
 
         <section id="view-class" class="page">
             <header class="page-header" id="classHeader">
-                <div><h1 id="viewClassTitle">Clase</h1><p data-i18n="class_view_subtitle">Gestión</p></div>
-                <div><button onclick="deleteCurrentClass()" class="btn-danger-outline"><i class="fas fa-trash"></i></button></div>
+                <div>
+                    <h1 id="viewClassTitle">Clase</h1>
+                    <p data-i18n="class_view_subtitle">Gestión</p>
+                </div>
+                <div>
+                    <button onclick="deleteCurrentClass()" class="btn-danger-outline"><i class="fas fa-trash"></i> Eliminar Clase</button>
+                </div>
             </header>
+
             <div class="class-cols">
                 <div class="col-left">
-                    <div class="card"><h3 data-i18n="rewards_title">⭐ Recompensas</h3><div id="classStudentGrid" class="rewards-grid"></div></div>
-                    <div class="card"><h3 data-i18n="grades_view">📊 Calificaciones</h3><div id="classGradebookView" class="readonly-table"></div></div>
+                    <div class="card">
+                        <h3 data-i18n="rewards_title">⭐ Recompensas (XP)</h3>
+                        <div id="classStudentGrid" class="rewards-grid"></div>
+                    </div>
+                    <div class="card">
+                        <h3 data-i18n="grades_view">📊 Calificaciones (Solo Lectura)</h3>
+                        <div id="classGradebookView" class="readonly-table"></div>
+                    </div>
                 </div>
+
                 <div class="col-right">
-                    <div class="card"><div class="card-head"><h3 data-i18n="logbook">📖 Bitácora</h3><button onclick="openLogModal()" class="btn-text">+</button></div><div id="classLogbookView" class="timeline"></div></div>
+                    <div class="card">
+                        <div class="card-head">
+                            <h3 data-i18n="logbook">📖 Bitácora</h3>
+                            <button onclick="openLogModal()" class="btn-text">+ Agregar</button>
+                        </div>
+                        <div id="classLogbookView" class="timeline"></div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -120,33 +158,53 @@
 
 <div id="modalConfig" class="modal-overlay"><div class="modal-box">
     <h3 data-i18n="settings">Configuración</h3>
-    <input type="text" id="cfgName" placeholder="Nombre">
-    <select id="cfgLang"><option value="es">Español</option><option value="en">English</option></select>
-    <div class="btn-row"><button onclick="cloudSync('pull')" class="btn-secondary">📥 Bajar Nube</button><button onclick="cloudSync('push')" class="btn-primary">📤 Subir Nube</button></div>
-    <div class="modal-footer"><button onclick="saveConfig()" class="btn-primary">Guardar</button><button onclick="closeModal('modalConfig')" class="btn-flat">X</button></div>
+    <input type="text" id="cfgName" placeholder="Nombre del Docente">
+    <select id="cfgLang">
+        <option value="es">Español</option>
+        <option value="en">English</option>
+    </select>
+    <div class="btn-row">
+        <button onclick="cloudSync('pull')" class="btn-secondary">📥 Restaurar Nube</button>
+        <button onclick="cloudSync('push')" class="btn-primary">📤 Guardar en Nube</button>
+    </div>
+    <div class="modal-footer">
+        <button onclick="saveConfig()" class="btn-primary">Guardar</button>
+        <button onclick="closeModal('modalConfig')" class="btn-flat">Cancelar</button>
+    </div>
 </div></div>
 
 <div id="modalClass" class="modal-overlay"><div class="modal-box">
     <h3 data-i18n="btn_new_class">Nueva Clase</h3>
-    <input type="text" id="newClassName" placeholder="Nombre">
-    <div class="icon-selector" id="iconSelector"></div><input type="hidden" id="selectedIcon" value="fa-chalkboard">
-    <div class="color-selector" id="colorSelector"></div><input type="hidden" id="selectedColor" value="#2563eb">
-    <div class="modal-footer"><button onclick="addClass()" class="btn-primary">Crear</button><button onclick="closeModal('modalClass')" class="btn-flat">X</button></div>
+    <input type="text" id="newClassName" placeholder="Nombre (ej. Matemáticas)">
+    <div class="icon-selector" id="iconSelector"></div>
+    <input type="hidden" id="selectedIcon" value="fa-chalkboard">
+    <div class="color-selector" id="colorSelector"></div>
+    <input type="hidden" id="selectedColor" value="#2563eb">
+    <div class="modal-footer">
+        <button onclick="addClass()" class="btn-primary">Crear</button>
+        <button onclick="closeModal('modalClass')" class="btn-flat">Cancelar</button>
+    </div>
 </div></div>
 
 <div id="modalStudent" class="modal-overlay"><div class="modal-box">
-    <h3>Alumno</h3>
-    <input type="text" id="newStudName" placeholder="Nombre">
+    <h3>Nuevo Alumno</h3>
+    <input type="text" id="newStudName" placeholder="Nombre Completo">
     <select id="newStudClass"></select>
-    <div class="modal-footer"><button onclick="addStudent()" class="btn-primary">Guardar</button><button onclick="closeModal('modalStudent')" class="btn-flat">X</button></div>
+    <div class="modal-footer">
+        <button onclick="addStudent()" class="btn-primary">Guardar</button>
+        <button onclick="closeModal('modalStudent')" class="btn-flat">Cancelar</button>
+    </div>
 </div></div>
 
 <div id="modalAssignment" class="modal-overlay"><div class="modal-box">
-    <h3>Actividad (Columna)</h3>
-    <input type="hidden" id="assEditId"> <input type="text" id="newAssTitle" placeholder="Título (ej. Examen)">
+    <h3>Actividad (Columna de Nota)</h3>
+    <input type="hidden" id="assEditId"> 
+    
+    <input type="text" id="newAssTitle" placeholder="Título (ej. Examen Parcial)">
     <input type="text" id="newAssTag" placeholder="Tag Corto (ej. P1)">
-    <label>Clase:</label>
+    <label>Asignar a Clase:</label>
     <select id="newAssClass"></select>
+    
     <div class="modal-footer">
         <button onclick="saveAssignment()" class="btn-primary">Guardar</button>
         <button onclick="closeModal('modalAssignment')" class="btn-flat">Cancelar</button>
@@ -156,38 +214,71 @@
 <div id="modalPlanning" class="modal-overlay"><div class="modal-box">
     <h3>Evento / Planificación</h3>
     <input type="hidden" id="planEditId">
+
     <input type="text" id="planTitle" placeholder="Título (ej. Examen Final)" onkeyup="checkSmartKeywords()">
     <input type="date" id="planDate">
-    <input type="text" id="planTag" placeholder="Etiqueta (ej. Tarea)">
+    <input type="text" id="planTag" placeholder="Etiqueta (ej. Tarea, Examen)">
     <select id="planClass"></select>
-    <textarea id="planDesc" placeholder="Detalles..."></textarea>
+    <textarea id="planDesc" placeholder="Detalles o descripción..."></textarea>
     
     <div class="smart-link-box">
         <label>
             <input type="checkbox" id="planLinkToGradebook"> 
-            📊 Crear también columna de nota
+            📊 <b>Smart Link:</b> Crear columna de nota automáticamente
         </label>
     </div>
 
-    <div class="modal-footer"><button onclick="savePlanning()" class="btn-primary">Guardar</button><button onclick="closeModal('modalPlanning')" class="btn-flat">X</button></div>
+    <div class="modal-footer">
+        <button onclick="savePlanning()" class="btn-primary">Guardar</button>
+        <button onclick="closeModal('modalPlanning')" class="btn-flat">Cancelar</button>
+    </div>
 </div></div>
 
 <div id="modalLog" class="modal-overlay"><div class="modal-box">
-    <h3>Entrada Bitácora</h3>
-    <input type="hidden" id="logEditId"> <select id="logStudent"></select>
-    <select id="logImp"><option value="low">🟢 Info</option><option value="medium">🟠 Alerta</option><option value="high">🔴 Peligro</option></select>
-    <textarea id="logText" rows="4"></textarea>
-    <div class="modal-footer"><button onclick="saveLog()" class="btn-primary">Guardar</button><button onclick="closeModal('modalLog')" class="btn-flat">X</button></div>
+    <h3>Entrada de Bitácora</h3>
+    <input type="hidden" id="logEditId">
+
+    <label>Alumno:</label>
+    <select id="logStudent"></select>
+    <label>Importancia:</label>
+    <select id="logImp">
+        <option value="low">🟢 Info General</option>
+        <option value="medium">🟠 Alerta / Atención</option>
+        <option value="high">🔴 Incidente Grave</option>
+    </select>
+    <textarea id="logText" rows="4" placeholder="Describe lo sucedido..."></textarea>
+    
+    <div class="modal-footer">
+        <button onclick="saveLog()" class="btn-primary">Guardar</button>
+        <button onclick="closeModal('modalLog')" class="btn-flat">Cancelar</button>
+    </div>
 </div></div>
 
 <div id="modalSchedule" class="modal-overlay"><div class="modal-box">
-    <h3>Horario</h3>
-    <select id="schDay"><option value="Lunes">Lunes</option><option value="Martes">Martes</option><option value="Miércoles">Miércoles</option><option value="Jueves">Jueves</option><option value="Viernes">Viernes</option></select>
+    <h3>Agregar al Horario</h3>
+    <label>Día:</label>
+    <select id="schDay">
+        <option value="Lunes">Lunes</option>
+        <option value="Martes">Martes</option>
+        <option value="Miércoles">Miércoles</option>
+        <option value="Jueves">Jueves</option>
+        <option value="Viernes">Viernes</option>
+    </select>
+    <label>Clase:</label>
     <select id="schClass"></select>
-    <div class="row-inputs"><input type="time" id="schStart"><input type="time" id="schEnd"></div>
-    <div class="modal-footer"><button onclick="addScheduleItem()" class="btn-primary">OK</button><button onclick="closeModal('modalSchedule')" class="btn-flat">X</button></div>
+    
+    <div class="row-inputs">
+        <div><label>Inicio</label><input type="time" id="schStart"></div>
+        <div><label>Fin</label><input type="time" id="schEnd"></div>
+    </div>
+    
+    <div class="modal-footer">
+        <button onclick="addScheduleItem()" class="btn-primary">Agregar Bloque</button>
+        <button onclick="closeModal('modalSchedule')" class="btn-flat">Cancelar</button>
+    </div>
 </div></div>
 
 <script src="script.js"></script>
+
 </body>
 </html>

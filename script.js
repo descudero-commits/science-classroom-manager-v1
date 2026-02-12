@@ -1,6 +1,6 @@
 // ================= CONFIGURACIÓN =================
-const PANTRY_ID = "9df76c09-c878-45e6-9df9-7b02d9cd00ef"; 
-const BASKET_NAME = "teacherTitaniumV16";
+const PANTRY_ID = "TU_ID_DE_PANTRY_AQUI"; 
+const BASKET_NAME = "teacherTitaniumV17";
 const API_URL = `https://getpantry.cloud/apiv1/pantry/${PANTRY_ID}/basket/${BASKET_NAME}`;
 
 // ================= DICCIONARIO =================
@@ -23,49 +23,233 @@ const dictionary = {
     }
 };
 
-// ================= ESTADO =================
+// ================= ESTADO INICIAL =================
 let app = {
     settings: { name: "Docente", lang: "es" },
-    classes: [], students: [], assignments: [], grades: {}, planning: [], logs: [], schedule: []
+    classes: [], 
+    students: [], 
+    assignments: [], 
+    grades: {}, 
+    planning: [], 
+    logs: [], 
+    schedule: [] // Array: { id, day, classId, start, end }
 };
 let currentClassId = null;
 
+// ================= INICIO =================
 document.addEventListener('DOMContentLoaded', () => {
-    loadLocal(); initCustomizers(); updateUI(); nav('dashboard');
+    loadLocal(); 
+    initCustomizers(); 
+    updateUI(); 
+    nav('dashboard');
 });
 
 // ================= UI & UTILS =================
 function t(key) { return dictionary[app.settings.lang || 'es'][key] || key; }
+
 function applyTranslations() {
     document.querySelectorAll('[data-i18n]').forEach(el => el.innerText = t(el.getAttribute('data-i18n')));
 }
+
 function nav(view) {
+    // Cambiar página visible
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById(`view-${view}`).classList.add('active');
+    
+    // Cambiar estado botones menú
     document.querySelectorAll('.menu button, .class-btn').forEach(b => b.classList.remove('active'));
-    if(view==='dashboard') { document.getElementById('nav-dashboard').classList.add('active'); renderDashboard(); }
-    if(view==='notebook') { document.getElementById('nav-notebook').classList.add('active'); renderStudents(); }
+    
+    if(view==='dashboard') { 
+        document.getElementById('nav-dashboard').classList.add('active'); 
+        renderDashboard(); // IMPORTANTE: Renderizar al entrar
+    }
+    if(view==='notebook') { 
+        document.getElementById('nav-notebook').classList.add('active'); 
+        renderStudents(); 
+    }
 }
+
 function switchNbTab(id) {
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     event.target.classList.add('active');
+    
     if(id==='tab-nb-students') renderStudents();
     if(id==='tab-nb-gradebook') renderGradebook();
     if(id==='tab-nb-planning') renderPlanning();
     if(id==='tab-nb-logs') renderLogs();
 }
+
 function openModal(id) { document.getElementById(id).style.display = 'flex'; }
 function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-function saveData() { localStorage.setItem('TeacherTitaniumV16', JSON.stringify(app)); }
-function loadLocal() { const d = localStorage.getItem('TeacherTitaniumV16'); if(d) app = JSON.parse(d); }
+function saveData() { localStorage.setItem('TeacherTitaniumV17', JSON.stringify(app)); }
+function loadLocal() { const d = localStorage.getItem('TeacherTitaniumV17'); if(d) app = JSON.parse(d); }
 
-// ================= CLASES =================
+// ================= LOGICA DASHBOARD (HORARIO Y RECOMPENSAS) =================
+
+function renderDashboard() {
+    // 1. RENDERIZAR HORARIO
+    const scheduleGrid = document.getElementById('dashSchedule');
+    scheduleGrid.innerHTML = '';
+    const days = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
+    
+    days.forEach(day => {
+        // Filtrar items del día y ordenar por hora de inicio
+        const dayItems = app.schedule
+            .filter(s => s.day === day)
+            .sort((a,b) => a.start.localeCompare(b.start));
+
+        let html = `<div class="day-col"><h4>${day}</h4>`;
+        
+        dayItems.forEach(item => {
+            const cls = app.classes.find(c => c.id == item.classId);
+            const color = cls ? cls.color : '#ccc';
+            const name = cls ? cls.name : 'Clase Borrada';
+            
+            html += `
+            <div class="sch-item" style="border-left-color: ${color}">
+                <div style="font-weight:bold; color:${color}">${name}</div>
+                <small><i class="far fa-clock"></i> ${item.start} - ${item.end}</small>
+                <div style="text-align:right; margin-top:5px">
+                    <button onclick="deleteScheduleItem('${item.id}')" style="border:none;background:none;color:red;cursor:pointer;">×</button>
+                </div>
+            </div>`;
+        });
+        
+        html += `</div>`;
+        scheduleGrid.innerHTML += html;
+    });
+
+    // 2. RENDERIZAR TOP ESTUDIANTES (GLOBAL)
+    const topList = document.getElementById('dashTopStudents');
+    topList.innerHTML = '';
+    
+    // Clonar array, ordenar por puntos descendente, tomar top 5
+    const topStudents = [...app.students]
+        .sort((a,b) => (b.points || 0) - (a.points || 0))
+        .slice(0, 5);
+
+    topStudents.forEach((s, index) => {
+        const cls = app.classes.find(c => c.id == s.classId);
+        const medals = ["🥇", "🥈", "🥉"];
+        const medal = medals[index] || "🏅";
+        
+        topList.innerHTML += `
+        <div class="top-student-row">
+            <div>
+                <span class="medal">${medal}</span> <b>${s.name}</b>
+                <br><small style="color:#666">${cls ? cls.name : ''}</small>
+            </div>
+            <span class="xp-badge">${s.points || 0} XP</span>
+        </div>`;
+    });
+
+    // 3. RENDERIZAR PROXIMOS EVENTOS (Resumen)
+    const planList = document.getElementById('dashPlannerList');
+    planList.innerHTML = '';
+    const upcoming = app.planning
+        .sort((a,b) => new Date(a.date) - new Date(b.date))
+        .filter(p => new Date(p.date) >= new Date().setHours(0,0,0,0)) // Solo futuros o hoy
+        .slice(0, 5);
+
+    upcoming.forEach(p => {
+        planList.innerHTML += `
+        <div style="padding:10px; border-bottom:1px solid #eee">
+            📌 <b>${p.title}</b> <span style="font-size:0.8rem; color:#666">(${p.date})</span>
+        </div>`;
+    });
+}
+
+// ================= HORARIO (SCHEDULE) LOGICA =================
+
+function openScheduleEditor() { 
+    openModal('modalSchedule'); 
+    const s = document.getElementById('schClass'); 
+    s.innerHTML = ''; 
+    app.classes.forEach(c => s.innerHTML += `<option value="${c.id}">${c.name}</option>`); 
+}
+
+function addScheduleItem() {
+    const day = document.getElementById('schDay').value;
+    const cid = document.getElementById('schClass').value;
+    const start = document.getElementById('schStart').value;
+    const end = document.getElementById('schEnd').value;
+
+    if(cid && start && end) {
+        app.schedule.push({
+            id: Date.now().toString(),
+            day: day,
+            classId: cid,
+            start: start,
+            end: end
+        });
+        saveData();
+        renderDashboard();
+        closeModal('modalSchedule');
+    } else {
+        alert("Por favor completa todos los campos del horario");
+    }
+}
+
+function deleteScheduleItem(id) {
+    if(confirm("¿Eliminar bloque horario?")) {
+        app.schedule = app.schedule.filter(s => s.id !== id);
+        saveData();
+        renderDashboard();
+    }
+}
+
+// ================= RECOMPENSAS & ALUMNOS (CLASE) =================
+
+function renderClassStudentGrid() {
+    const grid = document.getElementById('classStudentGrid');
+    grid.innerHTML = '';
+    
+    const studentsInClass = app.students.filter(s => s.classId == currentClassId);
+
+    if(studentsInClass.length === 0) {
+        grid.innerHTML = '<p style="color:#888; grid-column:1/-1; text-align:center">No hay alumnos en esta clase.</p>';
+        return;
+    }
+
+    studentsInClass.forEach(s => {
+        grid.innerHTML += `
+        <div class="student-card">
+            <h4>${s.name}</h4>
+            <div style="margin:10px 0;">
+                <span class="xp-badge">⭐ ${s.points || 0} XP</span>
+            </div>
+            <div class="btn-xp-row">
+                <button class="btn-xp plus" onclick="givePoints('${s.id}', 1)" title="+1 XP">+</button>
+                <button class="btn-xp minus" onclick="givePoints('${s.id}', -1)" title="-1 XP">-</button>
+            </div>
+        </div>`;
+    });
+}
+
+function givePoints(studentId, amount) {
+    const student = app.students.find(s => s.id == studentId);
+    if(student) {
+        // Inicializar si es undefined
+        if(typeof student.points !== 'number') student.points = 0;
+        
+        student.points += amount;
+        saveData();
+        
+        // Refrescar vista actual
+        renderClassStudentGrid(); 
+        
+        // Nota: El dashboard se actualizará cuando navegues a él
+    }
+}
+
+// ================= CLASES (CREACIÓN Y VISTA) =================
 function initCustomizers() {
-    const icons = ['fa-chalkboard', 'fa-flask', 'fa-book', 'fa-palette', 'fa-calculator', 'fa-music', 'fa-globe'];
-    const colors = ['#2563eb', '#dc2626', '#16a34a', '#d97706', '#9333ea', '#db2777', '#0891b2'];
+    const icons = ['fa-chalkboard', 'fa-flask', 'fa-book', 'fa-palette', 'fa-calculator', 'fa-music', 'fa-globe', 'fa-laptop-code'];
+    const colors = ['#2563eb', '#dc2626', '#16a34a', '#d97706', '#9333ea', '#db2777', '#0891b2', '#4b5563'];
     const iCont = document.getElementById('iconSelector'), cCont = document.getElementById('colorSelector');
+    
     if(iCont.innerHTML === '') {
         icons.forEach(ic => iCont.innerHTML += `<div class="sel-opt" onclick="selectOpt('selectedIcon', '${ic}', this)"><i class="fas ${ic}"></i></div>`);
         colors.forEach(col => cCont.innerHTML += `<div class="sel-color" style="background:${col}" onclick="selectOpt('selectedColor', '${col}', this)"></div>`);
@@ -79,7 +263,12 @@ function selectOpt(hiddenId, val, el) {
 function addClass() {
     const name = document.getElementById('newClassName').value;
     if(name) {
-        app.classes.push({ id: Date.now().toString(), name, icon: document.getElementById('selectedIcon').value, color: document.getElementById('selectedColor').value });
+        app.classes.push({ 
+            id: Date.now().toString(), 
+            name, 
+            icon: document.getElementById('selectedIcon').value, 
+            color: document.getElementById('selectedColor').value 
+        });
         saveData(); updateUI(); closeModal('modalClass');
     }
 }
@@ -90,8 +279,13 @@ function openClassView(id, btn) {
     h.style.borderLeft = `5px solid ${c.color}`;
     document.getElementById('viewClassTitle').innerText = c.name;
     document.getElementById('viewClassTitle').style.color = c.color;
-    renderClassStudentGrid(); renderClassGradebookView(); renderClassLogbookView();
-    nav('class'); if(btn) btn.classList.add('active');
+    
+    renderClassStudentGrid(); 
+    renderClassGradebookView(); 
+    renderClassLogbookView();
+    
+    nav('class'); 
+    if(btn) btn.classList.add('active');
 }
 
 // ================= GRADEBOOK & ASSIGNMENTS (EDITABLE) =================
@@ -102,14 +296,12 @@ function openAssignmentModal(editId = null) {
     app.classes.forEach(c => sel.innerHTML += `<option value="${c.id}">${c.name}</option>`);
 
     if(editId) {
-        // MODO EDICIÓN
         const task = app.assignments.find(a => a.id === editId);
         document.getElementById('assEditId').value = task.id;
         document.getElementById('newAssTitle').value = task.title;
         document.getElementById('newAssTag').value = task.tag;
         document.getElementById('newAssClass').value = task.classId;
     } else {
-        // MODO NUEVO
         document.getElementById('assEditId').value = "";
         document.getElementById('newAssTitle').value = "";
         document.getElementById('newAssTag').value = "";
@@ -124,7 +316,6 @@ function saveAssignment() {
 
     if(title && cid) {
         if(id) {
-            // EDITAR EXISTENTE
             const idx = app.assignments.findIndex(a => a.id === id);
             if(idx > -1) {
                 app.assignments[idx].title = title;
@@ -132,7 +323,6 @@ function saveAssignment() {
                 app.assignments[idx].classId = cid;
             }
         } else {
-            // CREAR NUEVO
             app.assignments.push({ id: Date.now().toString(), classId: cid, title, tag });
         }
         saveData(); renderGradebook(); closeModal('modalAssignment');
@@ -142,8 +332,6 @@ function saveAssignment() {
 function deleteAssignment(id) {
     if(confirm("¿Eliminar columna y notas asociadas?")) {
         app.assignments = app.assignments.filter(a => a.id !== id);
-        // Limpiar notas huerfanas (opcional pero recomendado)
-        // ...
         saveData(); renderGradebook();
     }
 }
@@ -157,7 +345,6 @@ function renderGradebook() {
     const studs = app.students.filter(s => s.classId == cid);
     
     let html = `<table><thead><tr><th>Alumno</th>`;
-    // HEADERS CON BOTONES DE EDICIÓN
     assigns.forEach(a => {
         html += `<th>
             <div style="display:flex; justify-content:space-between; align-items:center">
@@ -187,16 +374,13 @@ function renderGradebook() {
 // ================= PLANNING (SMART LINK) =================
 function openPlanningModal(editId = null) {
     openModal('modalPlanning');
-    // Llenar select
     const sel = document.getElementById('planClass');
     sel.innerHTML = '<option value="">-- Clase --</option>';
     app.classes.forEach(c => sel.innerHTML += `<option value="${c.id}">${c.name}</option>`);
     
-    // Reset Checkbox
     document.getElementById('planLinkToGradebook').checked = false;
 
     if(editId) {
-        // MODO EDICION
         const p = app.planning.find(x => x.id === editId);
         document.getElementById('planEditId').value = p.id;
         document.getElementById('planTitle').value = p.title;
@@ -204,10 +388,8 @@ function openPlanningModal(editId = null) {
         document.getElementById('planTag').value = p.tag;
         document.getElementById('planClass').value = p.classId;
         document.getElementById('planDesc').value = p.desc;
-        // Ocultar smart link en edición para no duplicar
         document.querySelector('.smart-link-box').style.display = 'none';
     } else {
-        // MODO NUEVO
         document.getElementById('planEditId').value = "";
         document.getElementById('planTitle').value = "";
         document.getElementById('planDate').value = "";
@@ -217,16 +399,11 @@ function openPlanningModal(editId = null) {
     }
 }
 
-// Detectar palabras clave
 function checkSmartKeywords() {
     const val = document.getElementById('planTitle').value.toLowerCase();
-    const keywords = ["examen", "prueba", "test", "entrega", "proyecto", "quiz", "evaluacion", "evaluación"];
+    const keywords = ["examen", "prueba", "test", "entrega", "proyecto", "quiz", "evaluacion"];
     const found = keywords.some(k => val.includes(k));
-    
-    // Si encuentra palabra clave, marca el checkbox automáticamente
-    if(found) {
-        document.getElementById('planLinkToGradebook').checked = true;
-    }
+    if(found) document.getElementById('planLinkToGradebook').checked = true;
 }
 
 function savePlanning() {
@@ -240,21 +417,16 @@ function savePlanning() {
 
     if(title && cid) {
         if(id) {
-            // Update
             const idx = app.planning.findIndex(p => p.id === id);
             if(idx > -1) {
                 app.planning[idx] = { ...app.planning[idx], title, date, tag, classId: cid, desc };
             }
         } else {
-            // New
             app.planning.push({ id: Date.now().toString(), title, date, tag: tag||"Evento", classId: cid, desc });
-            
-            // LOGICA SMART LINK: Si está marcado, crea la columna
             if(linkToGb) {
-                // Confirmamos por si acaso
                 if(confirm(`¿Crear también la columna "${title}" en el Gradebook?`)) {
                     app.assignments.push({ 
-                        id: Date.now().toString() + "_lnk", // ID distinto
+                        id: Date.now().toString() + "_lnk", 
                         classId: cid, 
                         title: title, 
                         tag: tag.substring(0,3).toUpperCase() || "EV" 
@@ -360,7 +532,7 @@ function deleteLog(id) {
     if(confirm("Eliminar entrada?")) { app.logs = app.logs.filter(l => l.id !== id); saveData(); renderLogs(); renderDashboard(); }
 }
 
-// ================= RESTO DE FUNCIONES (ALUMNOS, HORARIO...) =================
+// ================= ESTUDIANTES (CRUD BASIC) =================
 function addStudent() {
     const name = document.getElementById('newStudName').value; const cid = document.getElementById('newStudClass').value;
     if(name && cid) { app.students.push({ id: Date.now().toString(), name, classId: cid, points: 0 }); saveData(); renderStudents(); closeModal('modalStudent'); }
@@ -370,48 +542,12 @@ function renderStudents() {
     const t = document.getElementById('studentsTable');
     let d = app.students; if(cid) d = d.filter(s => s.classId == cid);
     let h = `<table><thead><tr><th>Nombre</th><th>XP</th><th>X</th></tr></thead><tbody>`;
-    d.forEach(s => h += `<tr><td>${s.name}</td><td>⭐ ${s.points}</td><td><button onclick="deleteStud('${s.id}')" class="btn-flat" style="color:red">×</button></td></tr>`);
+    d.forEach(s => h += `<tr><td>${s.name}</td><td>⭐ ${s.points||0}</td><td><button onclick="deleteStud('${s.id}')" class="btn-flat" style="color:red">×</button></td></tr>`);
     t.innerHTML = h + `</tbody></table>`;
 }
 function deleteStud(id) { if(confirm("Borrar?")) { app.students = app.students.filter(s => s.id !== id); saveData(); renderStudents(); } }
 
-function renderDashboard() {
-    // Schedule
-    const g = document.getElementById('dashSchedule'); g.innerHTML='';
-    ["Lunes","Martes","Miércoles","Jueves","Viernes"].forEach(d => {
-        let h = `<div class="day-col"><b>${d}</b>`;
-        app.schedule.filter(s => s.day==d).sort((a,b)=>a.start.localeCompare(b.start)).forEach(i => {
-            const c = app.classes.find(x=>x.id==i.classId);
-            h += `<div class="sch-item" style="border-left-color:${c?c.color:'#ccc'}"><small>${i.start}</small><br>${c?c.name:'?'}</div>`;
-        });
-        g.innerHTML += h + `</div>`;
-    });
-    // Top Students
-    const ts = document.getElementById('dashTopStudents'); ts.innerHTML='';
-    [...app.students].sort((a,b)=>(b.points||0)-(a.points||0)).slice(0,5).forEach(s => {
-        ts.innerHTML += `<div>🥇 <b>${s.name}</b> (${s.points})</div>`;
-    });
-    // Planner
-    const pl = document.getElementById('dashPlannerList'); pl.innerHTML='';
-    app.planning.slice(0,5).forEach(p => pl.innerHTML += `<div>📌 <b>${p.title}</b> (${p.date})</div>`);
-}
-
-function addScheduleItem() {
-    const day = document.getElementById('schDay').value; const cid = document.getElementById('schClass').value;
-    const start = document.getElementById('schStart').value; const end = document.getElementById('schEnd').value;
-    if(cid && start) { app.schedule.push({id:Date.now().toString(), day, classId:cid, start, end}); saveData(); renderDashboard(); closeModal('modalSchedule'); }
-}
-function openScheduleEditor() { openModal('modalSchedule'); const s = document.getElementById('schClass'); s.innerHTML=''; app.classes.forEach(c=>s.innerHTML+=`<option value="${c.id}">${c.name}</option>`); }
-
-// VISTAS CLASE
-function renderClassStudentGrid() {
-    const g = document.getElementById('classStudentGrid'); g.innerHTML='';
-    app.students.filter(s => s.classId == currentClassId).forEach(s => {
-        g.innerHTML += `<div class="student-card"><b>${s.name}</b><br><span style="color:#d97706">⭐ ${s.points}</span><br>
-        <button class="btn-icon" onclick="givePoints('${s.id}',1)">+</button><button class="btn-icon" onclick="givePoints('${s.id}',-1)">-</button></div>`;
-    });
-}
-function givePoints(id, v) { const s = app.students.find(x=>x.id==id); if(s){ s.points += v; saveData(); renderClassStudentGrid(); } }
+// ================= VISTAS DE SOLO LECTURA EN CLASE =================
 function renderClassGradebookView() {
     const d = document.getElementById('classGradebookView');
     const as = app.assignments.filter(a=>a.classId==currentClassId);
@@ -445,6 +581,7 @@ function updateUI() {
         const s = document.getElementById(id); if(s){ s.innerHTML='<option value="">Clase...</option>'; app.classes.forEach(c=>s.innerHTML+=`<option value="${c.id}">${c.name}</option>`); }
     });
 }
+
 function openConfigModal() { openModal('modalConfig'); document.getElementById('cfgName').value=app.settings.name; document.getElementById('cfgLang').value=app.settings.lang; }
 function saveConfig() { app.settings.name = document.getElementById('cfgName').value; app.settings.lang = document.getElementById('cfgLang').value; saveData(); updateUI(); closeModal('modalConfig'); }
 async function cloudSync(act) {
