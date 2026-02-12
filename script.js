@@ -674,4 +674,3 @@ async function cloudSync(act) {
         alert("OK"); document.getElementById('cloudStatus').innerText = "☁️ Synced";
     } catch(e) { alert("Error"); document.getElementById('cloudStatus').innerText = "⚠️ Error"; }
 }
-}
