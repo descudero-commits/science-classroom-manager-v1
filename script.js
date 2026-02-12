@@ -135,7 +135,7 @@ const TRANSLATIONS = {
 };
 
 // ================= CONFIGURACIÓN =================
-const PANTRY_ID = "9df76c09-c878-45e6-9df9-7b02d9cd00ef"; 
+const PANTRY_ID = "TU_ID_DE_PANTRY_AQUI"; 
 const BASKET_NAME = "teacherTitaniumV18";
 const API_URL = `https://getpantry.cloud/apiv1/pantry/${PANTRY_ID}/basket/${BASKET_NAME}`;
 
@@ -673,4 +673,5 @@ async function cloudSync(act) {
         else { const r=await fetch(API_URL); app=await r.json(); saveData(); location.reload(); }
         alert("OK"); document.getElementById('cloudStatus').innerText = "☁️ Synced";
     } catch(e) { alert("Error"); document.getElementById('cloudStatus').innerText = "⚠️ Error"; }
+}
 }
